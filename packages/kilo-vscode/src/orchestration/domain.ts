@@ -103,6 +103,29 @@ export type GraphSummary = {
   nodes: number
 }
 
+export type OrchestrationAgentLike = {
+  displayName?: string
+  description?: string
+  options?: Record<string, unknown>
+}
+
+export function isOrchestrationAgent(agent: OrchestrationAgentLike | null | undefined): boolean {
+  const value = agent?.options?.kiloOrchestration
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false
+  const binding = value as Record<string, unknown>
+  if (binding.version !== 2 || !binding.graph || typeof binding.graph !== "object" || Array.isArray(binding.graph)) {
+    return false
+  }
+  const graph = binding.graph as Record<string, unknown>
+  return typeof graph.id === "string" && graph.id.length > 0 && graph.scope === "global"
+}
+
+export function orchestrationAgentName(agent: OrchestrationAgentLike): string | undefined {
+  if (!isOrchestrationAgent(agent)) return undefined
+  if (agent.displayName) return agent.displayName
+  return agent.description?.match(/^Deterministic orchestration "(.+)"$/)?.[1]
+}
+
 /** Structured validation issue so the canvas and inspector can highlight the source. */
 export type GraphIssue = {
   code: string

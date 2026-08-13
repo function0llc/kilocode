@@ -3,7 +3,7 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { createSignal, createEffect, on, For, Index, onCleanup, Show, untrack, type Component } from "solid-js"
+import { createSignal, createEffect, createMemo, on, For, Index, onCleanup, Show, untrack, type Component } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
@@ -82,6 +82,7 @@ import { partReview, reviewBody } from "../../../../src/shared/review-comments"
 import { isEnterKeyCommitNotIme } from "../../utils/ime-enter"
 import { parseMemoryCommand } from "../../utils/memory-command"
 import { useMemory } from "../../context/memory"
+import { isOrchestrationAgent } from "../../../../src/orchestration/domain"
 
 function mergeReviewComments(current: ReviewComment[], incoming: ReviewComment[]): ReviewComment[] {
   if (incoming.length === 0) return current
@@ -180,6 +181,9 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
   const vscode = useVSCode()
   const projectMemory = useMemory()
   const sid = () => session.currentSessionID() ?? props.pendingSessionID ?? session.draftSessionID() ?? undefined
+  const orchestration = createMemo(() =>
+    isOrchestrationAgent(session.agents().find((agent) => agent.name === session.selectedAgent(sid()))),
+  )
   const ctx = () => {
     const id = props.boxId
     if (!id || !id.startsWith("agent-manager:")) return undefined
@@ -1493,9 +1497,24 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
       <div class="prompt-input-hint">
         <div class="prompt-input-hint-selectors">
           <ModeSwitcher sessionID={sid} />
-          <ModelSelector sessionID={sid} />
-          <ThinkingSelector sessionID={sid} />
-          <Show when={session.hasModelOverride(sid())}>
+          <Show
+            when={orchestration()}
+            fallback={
+              <>
+                <ModelSelector sessionID={sid} />
+                <ThinkingSelector sessionID={sid} />
+              </>
+            }
+          >
+            <Button variant="ghost" size="small" disabled>
+              {language.t("settings.agentBehaviour.subtab.orchestration")}
+            </Button>
+          </Show>
+          <Show
+            when={
+              !orchestration() && session.hasModelOverride(sid())
+            }
+          >
             <Tooltip value={language.t("prompt.action.resetModel")} placement="top" openDelay={0}>
               <Button
                 variant="ghost"

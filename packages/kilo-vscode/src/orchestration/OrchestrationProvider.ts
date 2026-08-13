@@ -7,7 +7,7 @@ import { type KiloConnectionService, ServerStartupError } from "../services/cli-
 import { computeDefaultSelection, fetchProviderData } from "../provider-actions"
 import { validateGraph, type OrchestrationGraph } from "./domain"
 import { deleteGraph, duplicateGraph, listGraphs, readGraph, renameGraph, uniqueId, writeGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError } from "./publish"
+import { buildAgentConfigFromGraph, PublishError, unpublishGraph } from "./publish"
 import type { OrchestrationRequest } from "./messages"
 import type { OrchestrationStartData } from "@kilocode/sdk/v2"
 
@@ -267,9 +267,14 @@ export class OrchestrationProvider implements vscode.Disposable {
 
   private async removeGraph(id: string): Promise<void> {
     try {
+      const removed = await unpublishGraph(this.connection.getClient(), this.directory(), id)
       await deleteGraph(await this.configDir(), id)
       this.post({ type: "orchestration.deleted", graphId: id })
       await this.sendGraphs()
+      if (removed) {
+        this.cachedAgents = null
+        await this.fetchAndSendAgents()
+      }
     } catch (err) {
       this.fail("deleteGraph", err)
     }

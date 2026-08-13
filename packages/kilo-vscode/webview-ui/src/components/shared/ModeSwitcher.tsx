@@ -14,9 +14,12 @@ import { useSession } from "../../context/session"
 import { useLanguage } from "../../context/language"
 import type { AgentInfo } from "../../types/messages"
 import { isEnterKeyCommitNotIme } from "../../utils/ime-enter"
+import { isOrchestrationAgent, orchestrationAgentName } from "../../../../src/orchestration/domain"
 
 /** Format an agent for display. Uses displayName if available, otherwise title-cases the slug. */
 function formatAgentLabel(agent: AgentInfo): string {
+  const orchestration = orchestrationAgentName(agent)
+  if (orchestration) return orchestration
   if (agent.displayName) return agent.displayName
   return agent.name
     .split(/[-_]/)
@@ -166,6 +169,11 @@ export const ModeSwitcherBase: Component<ModeSwitcherBaseProps> = (props) => {
                 >
                   <div style={{ display: "flex", "align-items": "center", gap: "6px" }}>
                     <span class="mode-switcher-item-name">{formatAgentLabel(agent)}</span>
+                    <Show when={isOrchestrationAgent(agent)}>
+                      <span class="mode-switcher-item-badge">
+                        {language.t("settings.agentBehaviour.subtab.orchestration")}
+                      </span>
+                    </Show>
                     <Show when={agent.deprecated}>
                       <span
                         style={{

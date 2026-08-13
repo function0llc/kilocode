@@ -3,7 +3,7 @@ import { getErrorMessage } from "../kilo-provider-utils"
 import type { OrchestrationRequest } from "./messages"
 import { validateGraph, type OrchestrationGraph } from "./domain"
 import { deleteGraph, duplicateGraph, listGraphs, readGraph, renameGraph, uniqueId, writeGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError } from "./publish"
+import { buildAgentConfigFromGraph, PublishError, unpublishGraph } from "./publish"
 
 type Options = {
   client: () => KiloClient
@@ -71,9 +71,11 @@ export class OrchestrationBridge {
   }
 
   private async remove(id: string) {
+    const removed = await unpublishGraph(this.opts.client(), this.opts.directory(), id)
     await deleteGraph(await this.opts.configDir(), id)
     this.opts.post({ type: "orchestration.deleted", graphId: id })
     await this.graphs()
+    if (removed) await this.opts.refreshAgents?.()
   }
 
   private async copy(id: string) {

@@ -7,6 +7,8 @@ import {
   createEdge,
   createGraph,
   nodeLabel,
+  isOrchestrationAgent,
+  orchestrationAgentName,
   slugify,
   summarize,
   validateGraph,
@@ -41,6 +43,31 @@ describe("orchestration domain", () => {
   it("summarizes graphs for the gallery", () => {
     const item = graph({ id: "demo", nodes: [node("a", "code"), node("b", "review")] })
     expect(summarize(item)).toMatchObject({ id: "demo", name: "Demo", nodes: 2 })
+  })
+
+  it("identifies published orchestration agents", () => {
+    expect(
+      isOrchestrationAgent({
+        options: { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } },
+      }),
+    ).toBe(true)
+    expect(isOrchestrationAgent({ options: {} })).toBe(false)
+    expect(
+      isOrchestrationAgent({
+        options: { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "project" } } },
+      }),
+    ).toBe(false)
+  })
+
+  it("reads names from current and legacy orchestration agents", () => {
+    const options = { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } }
+    expect(orchestrationAgentName({ displayName: "Current Name", description: "ignored", options })).toBe(
+      "Current Name",
+    )
+    expect(orchestrationAgentName({ description: 'Deterministic orchestration "Legacy Name"', options })).toBe(
+      "Legacy Name",
+    )
+    expect(orchestrationAgentName({ description: "Ordinary agent", options: {} })).toBeUndefined()
   })
 
   it("labels nodes by override display name", () => {

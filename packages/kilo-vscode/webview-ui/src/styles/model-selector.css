@@ -664,6 +664,14 @@
   font-weight: 500;
 }
 
+.mode-switcher-item-badge {
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: var(--kilo-font-size-10);
+  color: var(--vscode-badge-foreground);
+  background: var(--vscode-badge-background);
+}
+
 .mode-switcher-item-desc {
   display: block;
   font-size: var(--kilo-font-size-11);

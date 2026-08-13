@@ -1,7 +1,12 @@
 import { describe, expect, it } from "bun:test"
 import { createAgentNode, createCheckpointNode, createGraph } from "../../src/orchestration/domain"
 import type { OrchestrationGraph } from "../../src/orchestration/domain"
-import { buildAgentConfigFromGraph, PublishError } from "../../src/orchestration/publish"
+import {
+  buildAgentConfigFromGraph,
+  publishedAgentPaths,
+  PublishError,
+  unpublishGraph,
+} from "../../src/orchestration/publish"
 
 function graph(patch: Partial<OrchestrationGraph>): OrchestrationGraph {
   return { ...createGraph("Demo Pipeline"), ...patch }
@@ -15,6 +20,7 @@ describe("orchestration publish", () => {
     expect(result.slug).toBe("demo-pipeline")
     expect(result.config).toEqual({
       mode: "primary",
+      displayName: "Demo Pipeline",
       description: 'Deterministic orchestration "Demo Pipeline"',
       prompt: null,
       options: { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } },
@@ -38,5 +44,62 @@ describe("orchestration publish", () => {
         graph({ entryNodeId: "ghost", nodes: [createAgentNode("a", "architect", { x: 0, y: 0 })] }),
       ),
     ).toThrow(PublishError)
+  })
+
+  it("finds only agents published from the deleted graph", () => {
+    const binding = (id: string) => ({
+      options: { kiloOrchestration: { version: 2, graph: { id, scope: "global" } } },
+    })
+    expect(
+      publishedAgentPaths(
+        {
+          agent: {
+            "test-plan": binding("test-plan"),
+            architect: {},
+            "other-plan": binding("other-plan"),
+          },
+        },
+        "test-plan",
+      ),
+    ).toEqual([["agent", "test-plan"]])
+  })
+
+  it("unpublishes every agent bound to the graph without touching source agents", async () => {
+    const patches: unknown[] = []
+    const client = {
+      config: {
+        overlay: async () => ({
+          data: {
+            global: {
+              agent: {
+                current: {
+                  options: { kiloOrchestration: { version: 2, graph: { id: "test-plan", scope: "global" } } },
+                },
+                renamed: {
+                  options: { kiloOrchestration: { version: 2, graph: { id: "test-plan", scope: "global" } } },
+                },
+                architect: {},
+              },
+            },
+          },
+        }),
+        overlayUpdate: async (patch: unknown) => {
+          patches.push(patch)
+          return { data: {} }
+        },
+      },
+    }
+
+    expect(await unpublishGraph(client as never, "/repo", "test-plan")).toBe(true)
+    expect(patches).toEqual([
+      {
+        directory: "/repo",
+        scope: "global",
+        unset: [
+          ["agent", "current"],
+          ["agent", "renamed"],
+        ],
+      },
+    ])
   })
 })

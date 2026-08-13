@@ -1,7 +1,9 @@
+import type { KiloClient } from "@kilocode/sdk/v2"
 import { nodeById, slugify, type OrchestrationGraph } from "./domain"
 
 export type PublishedAgentConfig = {
   mode: "primary"
+  displayName: string
   description: string
   prompt: null
   options: {
@@ -15,6 +17,33 @@ export type PublishedAgentConfig = {
 export type PublishResult = { slug: string; config: PublishedAgentConfig }
 export class PublishError extends Error {}
 
+type ConfigLike = {
+  agent?: Record<string, { options?: Record<string, unknown> } | undefined>
+}
+
+export function publishedAgentPaths(config: ConfigLike, graphID: string): string[][] {
+  return Object.entries(config.agent ?? {})
+    .filter(([, agent]) => {
+      if (!agent) return false
+      const value = agent.options?.kiloOrchestration
+      if (!value || typeof value !== "object" || Array.isArray(value)) return false
+      const binding = value as Record<string, unknown>
+      const graph = binding.graph
+      if (!graph || typeof graph !== "object" || Array.isArray(graph)) return false
+      const ref = graph as Record<string, unknown>
+      return binding.version === 2 && ref.scope === "global" && ref.id === graphID
+    })
+    .map(([slug]) => ["agent", slug])
+}
+
+export async function unpublishGraph(client: KiloClient, directory: string, graphID: string): Promise<boolean> {
+  const { data } = await client.config.overlay({ directory, scope: "global" }, { throwOnError: true })
+  const unset = publishedAgentPaths(data.global, graphID)
+  if (unset.length === 0) return false
+  await client.config.overlayUpdate({ directory, scope: "global", unset }, { throwOnError: true })
+  return true
+}
+
 export function buildAgentConfigFromGraph(graph: OrchestrationGraph): PublishResult {
   if (graph.nodes.length === 0) throw new PublishError("Cannot publish an empty graph")
   if (!graph.entryNodeId) throw new PublishError("Set an entry node before publishing")
@@ -23,6 +52,7 @@ export function buildAgentConfigFromGraph(graph: OrchestrationGraph): PublishRes
     slug: slugify(graph.name),
     config: {
       mode: "primary",
+      displayName: graph.name,
       description: `Deterministic orchestration "${graph.name}"`,
       prompt: null,
       options: {
