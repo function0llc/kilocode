@@ -38,6 +38,12 @@
   flex: 0 0 auto;
 }
 
+.agent-behaviour:not(.orchestration-active) {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
 .agent-behaviour.orchestration-active {
   display: flex;
   flex: 1;
