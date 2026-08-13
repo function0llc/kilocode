@@ -1,4 +1,5 @@
 import type { InstallMarketplaceItemOptions, MarketplaceFilters, MarketplaceItem } from "../marketplace"
+import type { OrchestrationRequest } from "./orchestration"
 import type { FileAttachment } from "./parts"
 import type { MessageLoadMode } from "./sessions"
 import type { PermissionFileDiff } from "./permissions"
@@ -1388,6 +1389,7 @@ export interface DismissAgentMigrationBannerMessage {
 
 export type WebviewMessage =
   | SendMessageRequest
+  | OrchestrationRequest
   | AbortRequest
   | RevertSessionRequest
   | UnrevertSessionRequest

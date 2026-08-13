@@ -274,6 +274,7 @@ function getWebviewsConfig() {
       "agent-manager": "webview-ui/agent-manager/index.tsx",
       kiloclaw: "webview-ui/kiloclaw/index.tsx",
       marketplace: "webview-ui/marketplace/index.tsx",
+      orchestration: "webview-ui/orchestration/index.tsx",
       "diff-viewer": "webview-ui/diff-viewer/index.tsx",
       "diff-virtual": "webview-ui/diff-virtual/index.tsx",
       webview: "webview-ui/src/index.tsx",

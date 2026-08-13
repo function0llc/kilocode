@@ -29,6 +29,15 @@ export interface AgentInfo {
   deprecated?: boolean
   color?: string
   permission?: PermissionRuleItem[]
+  model?: { providerID: string; modelID: string }
+  variant?: string
+  prompt?: string
+  temperature?: number
+  topP?: number
+  steps?: number
+  options?: Record<string, unknown>
+  requirements?: unknown
+  source?: string
 }
 
 export interface AgentRequirementSkill {

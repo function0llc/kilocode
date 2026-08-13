@@ -214,7 +214,7 @@ const Settings: Component<SettingsProps> = (props) => {
           <h3>{language.t("settings.providers.title")}</h3>
           <ProvidersTab />
         </Tabs.Content>
-        <Tabs.Content value="agentBehaviour">
+        <Tabs.Content value="agentBehaviour" class="settings-agent-behaviour-content">
           <h3>{language.t("settings.agentBehaviour.title")}</h3>
           <AgentBehaviourTab />
         </Tabs.Content>

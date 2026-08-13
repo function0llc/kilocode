@@ -89,6 +89,8 @@ import { SessionTools } from "./tools"
 import { LLMEvent } from "@opencode-ai/llm"
 import { RepositoryCache } from "@opencode-ai/core/repository-cache" // kilocode_change
 import { SessionResume } from "@/kilocode/session-resume" // kilocode_change
+import { effectiveAgent } from "@/kilocode/orchestration/effective-agent" // kilocode_change
+import { KiloOrchestrationSession } from "@/kilocode/orchestration/session" // kilocode_change
 
 // @ts-ignore
 globalThis.AI_SDK_LOG_WARNINGS = false
@@ -1626,14 +1628,27 @@ export const layer = Layer.effect(
           continue
         }
 
-        const agent = yield* agents.get(lastUser.agent)
-        if (!agent) {
+        // kilocode_change start - invocation-local orchestration agent overrides
+        const source = yield* agents.get(lastUser.agent)
+        if (!source) {
           const available = (yield* agents.list()).filter((a) => !a.hidden).map((a) => a.name)
           const hint = available.length ? ` Available agents: ${available.join(", ")}` : ""
           const error = new NamedError.Unknown({ message: `Agent not found: "${lastUser.agent}".${hint}` })
           yield* events.publish(Session.Event.Error, { sessionID, error: error.toObject() })
           throw error
         }
+        const agent = effectiveAgent(sessionID, source)
+        const orchestration = yield* KiloOrchestrationSession.run({
+          agent,
+          session,
+          user: lastUser,
+          agents,
+          sessions,
+          question,
+          messages: msgs,
+        }).pipe(Effect.orDie)
+        if (orchestration) return orchestration
+        // kilocode_change end
         const maxSteps = agent.steps ?? Infinity
         const isLastStep = step >= maxSteps
         msgs = yield* SessionReminders.apply({ messages: msgs, agent, session }).pipe(

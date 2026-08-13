@@ -14,7 +14,7 @@
 //
 // We strip only this known denylist rather than allowlisting provider options,
 // so genuine provider options an agent sets continue to pass through untouched.
-export const INTERNAL_OPTION_KEYS = ["id", "displayName", "source", "reference", "resolved"] as const
+export const INTERNAL_OPTION_KEYS = ["id", "displayName", "source", "reference", "resolved", "kiloOrchestration"] as const
 
 const internal: ReadonlySet<string> = new Set(INTERNAL_OPTION_KEYS)
 

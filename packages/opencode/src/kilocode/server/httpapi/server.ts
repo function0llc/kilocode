@@ -29,6 +29,8 @@ import { sandboxHandlers } from "./handlers/sandbox"
 import { sessionImportHandlers } from "./handlers/session-import"
 import { suggestionHandlers } from "./handlers/suggestion"
 import { telemetryHandlers } from "./handlers/telemetry"
+import { orchestrationHandlers } from "./handlers/orchestration"
+import * as Orchestration from "@/kilocode/orchestration/service"
 
 export const provide = Layer.provide([
   agentBuilderHandlers,
@@ -45,6 +47,7 @@ export const provide = Layer.provide([
   kilocodeHandlers,
   memoryHandlers,
   networkHandlers,
+  orchestrationHandlers.pipe(Layer.provide(AppNodeBuilderV1.build(Orchestration.node))),
   remoteHandlers,
   sandboxHandlers,
   sessionImportHandlers,

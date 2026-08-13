@@ -16217,6 +16217,4188 @@
         ]
       }
     },
+    "/kilocode/orchestration/run": {
+      "post": {
+        "tags": ["kilo HttpApi"],
+        "operationId": "orchestration.start",
+        "parameters": [
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orchestration run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "graphId": {
+                      "type": "string"
+                    },
+                    "graphName": {
+                      "type": "string"
+                    },
+                    "graph": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "number",
+                          "enum": [2]
+                        },
+                        "entryNodeId": {
+                          "type": "string"
+                        },
+                        "outputNodeId": {
+                          "type": "string"
+                        },
+                        "nodes": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["agent"]
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "agentName": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["agentName"],
+                                    "additionalProperties": false
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "overrides": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "type": "string"
+                                      },
+                                      "model": {
+                                        "type": "object",
+                                        "properties": {
+                                          "providerID": {
+                                            "type": "string"
+                                          },
+                                          "modelID": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["providerID", "modelID"],
+                                        "additionalProperties": false
+                                      },
+                                      "variant": {
+                                        "type": "string"
+                                      },
+                                      "prompt": {
+                                        "type": "object",
+                                        "properties": {
+                                          "mode": {
+                                            "type": "string",
+                                            "enum": ["inherit", "append", "replace"]
+                                          },
+                                          "text": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["mode"],
+                                        "additionalProperties": false
+                                      },
+                                      "temperature": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "topP": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "steps": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "permission": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "permission": {
+                                              "type": "string"
+                                            },
+                                            "pattern": {
+                                              "type": "string"
+                                            },
+                                            "action": {
+                                              "type": "string",
+                                              "enum": ["allow", "ask", "deny"]
+                                            }
+                                          },
+                                          "required": ["permission", "action"],
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                      "skills": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "mcpServers": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "required": ["skills", "mcpServers"],
+                                    "additionalProperties": false
+                                  },
+                                  "runtime": {
+                                    "type": "object",
+                                    "properties": {
+                                      "timeoutMs": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "retries": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "failure": {
+                                        "type": "string",
+                                        "enum": ["stop", "continue"]
+                                      },
+                                      "includeInFinalOutput": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": ["failure"],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "kind",
+                                  "source",
+                                  "position",
+                                  "overrides",
+                                  "capabilities",
+                                  "runtime"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["checkpoint"]
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "prompt": {
+                                    "type": "string"
+                                  },
+                                  "options": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string"
+                                        },
+                                        "label": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["id", "label"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["id", "kind", "position", "prompt", "options"],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        },
+                        "edges": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "from": {
+                                "type": "string"
+                              },
+                              "to": {
+                                "type": "string"
+                              },
+                              "route": {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["forward", "reprocess"]
+                                  },
+                                  "outcome": {
+                                    "type": "string"
+                                  },
+                                  "maxTraversals": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["NaN"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["-Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity", "-Infinity", "NaN"]
+                                      }
+                                    ]
+                                  },
+                                  "onLimit": {
+                                    "type": "string",
+                                    "enum": ["continue", "stop", "fail"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["id", "from", "to", "route"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "version",
+                        "entryNodeId",
+                        "outputNodeId",
+                        "nodes",
+                        "edges",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "directory": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+                    },
+                    "input": {
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "nodeId": {
+                              "type": "string"
+                            },
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": ["queued", "running", "completed", "failed", "cancelled"]
+                            },
+                            "attempts": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "output": {
+                              "type": "string"
+                            },
+                            "error": {
+                              "type": "string"
+                            },
+                            "sessionID": {
+                              "type": "string"
+                            },
+                            "startedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "finishedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["nodeId", "round", "status", "attempts"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "edges": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "traversals": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["NaN"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["-Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity", "-Infinity", "NaN"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["traversals"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "checkpoints": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "feedback": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["round", "outcome"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "waiting": {
+                      "type": "object",
+                      "properties": {
+                        "nodeId": {
+                          "type": "string"
+                        },
+                        "round": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["NaN"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["-Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity", "-Infinity", "NaN"]
+                            }
+                          ]
+                        },
+                        "prompt": {
+                          "type": "string"
+                        },
+                        "options": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["nodeId", "round", "prompt", "options"],
+                      "additionalProperties": false
+                    },
+                    "createdAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "graphId",
+                    "graphName",
+                    "graph",
+                    "status",
+                    "input",
+                    "nodes",
+                    "edges",
+                    "checkpoints",
+                    "createdAt",
+                    "updatedAt",
+                    "revision"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Orchestration run"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "OrchestrationInvalidGraphError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrchestrationInvalidGraphError"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Start orchestration run",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "graph": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "version": {
+                        "type": "number",
+                        "enum": [2]
+                      },
+                      "entryNodeId": {
+                        "type": "string"
+                      },
+                      "outputNodeId": {
+                        "type": "string"
+                      },
+                      "nodes": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "type": "string",
+                                  "enum": ["agent"]
+                                },
+                                "source": {
+                                  "type": "object",
+                                  "properties": {
+                                    "agentName": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["agentName"],
+                                  "additionalProperties": false
+                                },
+                                "position": {
+                                  "type": "object",
+                                  "properties": {
+                                    "x": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "y": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["x", "y"],
+                                  "additionalProperties": false
+                                },
+                                "overrides": {
+                                  "type": "object",
+                                  "properties": {
+                                    "displayName": {
+                                      "type": "string"
+                                    },
+                                    "description": {
+                                      "type": "string"
+                                    },
+                                    "model": {
+                                      "type": "object",
+                                      "properties": {
+                                        "providerID": {
+                                          "type": "string"
+                                        },
+                                        "modelID": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["providerID", "modelID"],
+                                      "additionalProperties": false
+                                    },
+                                    "variant": {
+                                      "type": "string"
+                                    },
+                                    "prompt": {
+                                      "type": "object",
+                                      "properties": {
+                                        "mode": {
+                                          "type": "string",
+                                          "enum": ["inherit", "append", "replace"]
+                                        },
+                                        "text": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["mode"],
+                                      "additionalProperties": false
+                                    },
+                                    "temperature": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "topP": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "steps": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "permission": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "object",
+                                        "properties": {
+                                          "permission": {
+                                            "type": "string"
+                                          },
+                                          "pattern": {
+                                            "type": "string"
+                                          },
+                                          "action": {
+                                            "type": "string",
+                                            "enum": ["allow", "ask", "deny"]
+                                          }
+                                        },
+                                        "required": ["permission", "action"],
+                                        "additionalProperties": false
+                                      }
+                                    }
+                                  },
+                                  "additionalProperties": false
+                                },
+                                "capabilities": {
+                                  "type": "object",
+                                  "properties": {
+                                    "skills": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "mcpServers": {
+                                      "type": "array",
+                                      "items": {
+                                        "type": "string"
+                                      }
+                                    }
+                                  },
+                                  "required": ["skills", "mcpServers"],
+                                  "additionalProperties": false
+                                },
+                                "runtime": {
+                                  "type": "object",
+                                  "properties": {
+                                    "timeoutMs": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "retries": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "failure": {
+                                      "type": "string",
+                                      "enum": ["stop", "continue"]
+                                    },
+                                    "includeInFinalOutput": {
+                                      "type": "boolean"
+                                    }
+                                  },
+                                  "required": ["failure"],
+                                  "additionalProperties": false
+                                }
+                              },
+                              "required": ["id", "kind", "source", "position", "overrides", "capabilities", "runtime"],
+                              "additionalProperties": false
+                            },
+                            {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "type": "string",
+                                  "enum": ["checkpoint"]
+                                },
+                                "position": {
+                                  "type": "object",
+                                  "properties": {
+                                    "x": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    },
+                                    "y": {
+                                      "anyOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["NaN"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["-Infinity"]
+                                        },
+                                        {
+                                          "type": "string",
+                                          "enum": ["Infinity", "-Infinity", "NaN"]
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": ["x", "y"],
+                                  "additionalProperties": false
+                                },
+                                "prompt": {
+                                  "type": "string"
+                                },
+                                "options": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "object",
+                                    "properties": {
+                                      "id": {
+                                        "type": "string"
+                                      },
+                                      "label": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["id", "label"],
+                                    "additionalProperties": false
+                                  }
+                                }
+                              },
+                              "required": ["id", "kind", "position", "prompt", "options"],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "edges": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            },
+                            "route": {
+                              "type": "object",
+                              "properties": {
+                                "type": {
+                                  "type": "string",
+                                  "enum": ["forward", "reprocess"]
+                                },
+                                "outcome": {
+                                  "type": "string"
+                                },
+                                "maxTraversals": {
+                                  "anyOf": [
+                                    {
+                                      "type": "number"
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["NaN"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["Infinity"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["-Infinity"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["Infinity", "-Infinity", "NaN"]
+                                    }
+                                  ]
+                                },
+                                "onLimit": {
+                                  "type": "string",
+                                  "enum": ["continue", "stop", "fail"]
+                                }
+                              },
+                              "required": ["type"],
+                              "additionalProperties": false
+                            }
+                          },
+                          "required": ["id", "from", "to", "route"],
+                          "additionalProperties": false
+                        }
+                      },
+                      "updatedAt": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["id", "name", "version", "entryNodeId", "outputNodeId", "nodes", "edges", "updatedAt"],
+                    "additionalProperties": false
+                  },
+                  "input": {
+                    "type": "string"
+                  },
+                  "concurrency": {
+                    "anyOf": [
+                      {
+                        "type": "number"
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["NaN"]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["Infinity"]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["-Infinity"]
+                      },
+                      {
+                        "type": "string",
+                        "enum": ["Infinity", "-Infinity", "NaN"]
+                      }
+                    ]
+                  }
+                },
+                "required": ["graph", "input"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createKiloClient } from \"@kilocode/sdk\"\n\nconst client = createKiloClient()\nawait client.orchestration.start({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/kilocode/orchestration/run/{runID}": {
+      "get": {
+        "tags": ["kilo HttpApi"],
+        "operationId": "orchestration.get",
+        "parameters": [
+          {
+            "name": "runID",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orchestration run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "graphId": {
+                      "type": "string"
+                    },
+                    "graphName": {
+                      "type": "string"
+                    },
+                    "graph": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "number",
+                          "enum": [2]
+                        },
+                        "entryNodeId": {
+                          "type": "string"
+                        },
+                        "outputNodeId": {
+                          "type": "string"
+                        },
+                        "nodes": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["agent"]
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "agentName": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["agentName"],
+                                    "additionalProperties": false
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "overrides": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "type": "string"
+                                      },
+                                      "model": {
+                                        "type": "object",
+                                        "properties": {
+                                          "providerID": {
+                                            "type": "string"
+                                          },
+                                          "modelID": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["providerID", "modelID"],
+                                        "additionalProperties": false
+                                      },
+                                      "variant": {
+                                        "type": "string"
+                                      },
+                                      "prompt": {
+                                        "type": "object",
+                                        "properties": {
+                                          "mode": {
+                                            "type": "string",
+                                            "enum": ["inherit", "append", "replace"]
+                                          },
+                                          "text": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["mode"],
+                                        "additionalProperties": false
+                                      },
+                                      "temperature": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "topP": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "steps": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "permission": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "permission": {
+                                              "type": "string"
+                                            },
+                                            "pattern": {
+                                              "type": "string"
+                                            },
+                                            "action": {
+                                              "type": "string",
+                                              "enum": ["allow", "ask", "deny"]
+                                            }
+                                          },
+                                          "required": ["permission", "action"],
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                      "skills": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "mcpServers": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "required": ["skills", "mcpServers"],
+                                    "additionalProperties": false
+                                  },
+                                  "runtime": {
+                                    "type": "object",
+                                    "properties": {
+                                      "timeoutMs": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "retries": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "failure": {
+                                        "type": "string",
+                                        "enum": ["stop", "continue"]
+                                      },
+                                      "includeInFinalOutput": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": ["failure"],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "kind",
+                                  "source",
+                                  "position",
+                                  "overrides",
+                                  "capabilities",
+                                  "runtime"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["checkpoint"]
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "prompt": {
+                                    "type": "string"
+                                  },
+                                  "options": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string"
+                                        },
+                                        "label": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["id", "label"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["id", "kind", "position", "prompt", "options"],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        },
+                        "edges": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "from": {
+                                "type": "string"
+                              },
+                              "to": {
+                                "type": "string"
+                              },
+                              "route": {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["forward", "reprocess"]
+                                  },
+                                  "outcome": {
+                                    "type": "string"
+                                  },
+                                  "maxTraversals": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["NaN"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["-Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity", "-Infinity", "NaN"]
+                                      }
+                                    ]
+                                  },
+                                  "onLimit": {
+                                    "type": "string",
+                                    "enum": ["continue", "stop", "fail"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["id", "from", "to", "route"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "version",
+                        "entryNodeId",
+                        "outputNodeId",
+                        "nodes",
+                        "edges",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "directory": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+                    },
+                    "input": {
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "nodeId": {
+                              "type": "string"
+                            },
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": ["queued", "running", "completed", "failed", "cancelled"]
+                            },
+                            "attempts": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "output": {
+                              "type": "string"
+                            },
+                            "error": {
+                              "type": "string"
+                            },
+                            "sessionID": {
+                              "type": "string"
+                            },
+                            "startedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "finishedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["nodeId", "round", "status", "attempts"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "edges": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "traversals": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["NaN"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["-Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity", "-Infinity", "NaN"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["traversals"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "checkpoints": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "feedback": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["round", "outcome"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "waiting": {
+                      "type": "object",
+                      "properties": {
+                        "nodeId": {
+                          "type": "string"
+                        },
+                        "round": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["NaN"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["-Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity", "-Infinity", "NaN"]
+                            }
+                          ]
+                        },
+                        "prompt": {
+                          "type": "string"
+                        },
+                        "options": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["nodeId", "round", "prompt", "options"],
+                      "additionalProperties": false
+                    },
+                    "createdAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "graphId",
+                    "graphName",
+                    "graph",
+                    "status",
+                    "input",
+                    "nodes",
+                    "edges",
+                    "checkpoints",
+                    "createdAt",
+                    "updatedAt",
+                    "revision"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Orchestration run"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "OrchestrationRunNotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrchestrationRunNotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get orchestration run",
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createKiloClient } from \"@kilocode/sdk\"\n\nconst client = createKiloClient()\nawait client.orchestration.get({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/kilocode/orchestration/run/{runID}/cancel": {
+      "post": {
+        "tags": ["kilo HttpApi"],
+        "operationId": "orchestration.cancel",
+        "parameters": [
+          {
+            "name": "runID",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Cancelled orchestration run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "graphId": {
+                      "type": "string"
+                    },
+                    "graphName": {
+                      "type": "string"
+                    },
+                    "graph": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "number",
+                          "enum": [2]
+                        },
+                        "entryNodeId": {
+                          "type": "string"
+                        },
+                        "outputNodeId": {
+                          "type": "string"
+                        },
+                        "nodes": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["agent"]
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "agentName": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["agentName"],
+                                    "additionalProperties": false
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "overrides": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "type": "string"
+                                      },
+                                      "model": {
+                                        "type": "object",
+                                        "properties": {
+                                          "providerID": {
+                                            "type": "string"
+                                          },
+                                          "modelID": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["providerID", "modelID"],
+                                        "additionalProperties": false
+                                      },
+                                      "variant": {
+                                        "type": "string"
+                                      },
+                                      "prompt": {
+                                        "type": "object",
+                                        "properties": {
+                                          "mode": {
+                                            "type": "string",
+                                            "enum": ["inherit", "append", "replace"]
+                                          },
+                                          "text": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["mode"],
+                                        "additionalProperties": false
+                                      },
+                                      "temperature": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "topP": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "steps": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "permission": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "permission": {
+                                              "type": "string"
+                                            },
+                                            "pattern": {
+                                              "type": "string"
+                                            },
+                                            "action": {
+                                              "type": "string",
+                                              "enum": ["allow", "ask", "deny"]
+                                            }
+                                          },
+                                          "required": ["permission", "action"],
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                      "skills": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "mcpServers": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "required": ["skills", "mcpServers"],
+                                    "additionalProperties": false
+                                  },
+                                  "runtime": {
+                                    "type": "object",
+                                    "properties": {
+                                      "timeoutMs": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "retries": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "failure": {
+                                        "type": "string",
+                                        "enum": ["stop", "continue"]
+                                      },
+                                      "includeInFinalOutput": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": ["failure"],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "kind",
+                                  "source",
+                                  "position",
+                                  "overrides",
+                                  "capabilities",
+                                  "runtime"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["checkpoint"]
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "prompt": {
+                                    "type": "string"
+                                  },
+                                  "options": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string"
+                                        },
+                                        "label": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["id", "label"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["id", "kind", "position", "prompt", "options"],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        },
+                        "edges": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "from": {
+                                "type": "string"
+                              },
+                              "to": {
+                                "type": "string"
+                              },
+                              "route": {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["forward", "reprocess"]
+                                  },
+                                  "outcome": {
+                                    "type": "string"
+                                  },
+                                  "maxTraversals": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["NaN"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["-Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity", "-Infinity", "NaN"]
+                                      }
+                                    ]
+                                  },
+                                  "onLimit": {
+                                    "type": "string",
+                                    "enum": ["continue", "stop", "fail"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["id", "from", "to", "route"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "version",
+                        "entryNodeId",
+                        "outputNodeId",
+                        "nodes",
+                        "edges",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "directory": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+                    },
+                    "input": {
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "nodeId": {
+                              "type": "string"
+                            },
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": ["queued", "running", "completed", "failed", "cancelled"]
+                            },
+                            "attempts": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "output": {
+                              "type": "string"
+                            },
+                            "error": {
+                              "type": "string"
+                            },
+                            "sessionID": {
+                              "type": "string"
+                            },
+                            "startedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "finishedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["nodeId", "round", "status", "attempts"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "edges": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "traversals": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["NaN"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["-Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity", "-Infinity", "NaN"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["traversals"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "checkpoints": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "feedback": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["round", "outcome"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "waiting": {
+                      "type": "object",
+                      "properties": {
+                        "nodeId": {
+                          "type": "string"
+                        },
+                        "round": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["NaN"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["-Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity", "-Infinity", "NaN"]
+                            }
+                          ]
+                        },
+                        "prompt": {
+                          "type": "string"
+                        },
+                        "options": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["nodeId", "round", "prompt", "options"],
+                      "additionalProperties": false
+                    },
+                    "createdAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "graphId",
+                    "graphName",
+                    "graph",
+                    "status",
+                    "input",
+                    "nodes",
+                    "edges",
+                    "checkpoints",
+                    "createdAt",
+                    "updatedAt",
+                    "revision"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Cancelled orchestration run"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "OrchestrationRunNotFoundError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrchestrationRunNotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Cancel orchestration run",
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createKiloClient } from \"@kilocode/sdk\"\n\nconst client = createKiloClient()\nawait client.orchestration.cancel({\n  ...\n})"
+          }
+        ]
+      }
+    },
+    "/kilocode/orchestration/run/{runID}/checkpoint": {
+      "post": {
+        "tags": ["kilo HttpApi"],
+        "operationId": "orchestration.checkpoint",
+        "parameters": [
+          {
+            "name": "runID",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          },
+          {
+            "name": "directory",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          },
+          {
+            "name": "workspace",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resumed orchestration run",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "graphId": {
+                      "type": "string"
+                    },
+                    "graphName": {
+                      "type": "string"
+                    },
+                    "graph": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "version": {
+                          "type": "number",
+                          "enum": [2]
+                        },
+                        "entryNodeId": {
+                          "type": "string"
+                        },
+                        "outputNodeId": {
+                          "type": "string"
+                        },
+                        "nodes": {
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["agent"]
+                                  },
+                                  "source": {
+                                    "type": "object",
+                                    "properties": {
+                                      "agentName": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["agentName"],
+                                    "additionalProperties": false
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "overrides": {
+                                    "type": "object",
+                                    "properties": {
+                                      "displayName": {
+                                        "type": "string"
+                                      },
+                                      "description": {
+                                        "type": "string"
+                                      },
+                                      "model": {
+                                        "type": "object",
+                                        "properties": {
+                                          "providerID": {
+                                            "type": "string"
+                                          },
+                                          "modelID": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["providerID", "modelID"],
+                                        "additionalProperties": false
+                                      },
+                                      "variant": {
+                                        "type": "string"
+                                      },
+                                      "prompt": {
+                                        "type": "object",
+                                        "properties": {
+                                          "mode": {
+                                            "type": "string",
+                                            "enum": ["inherit", "append", "replace"]
+                                          },
+                                          "text": {
+                                            "type": "string"
+                                          }
+                                        },
+                                        "required": ["mode"],
+                                        "additionalProperties": false
+                                      },
+                                      "temperature": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "topP": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "steps": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "permission": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "object",
+                                          "properties": {
+                                            "permission": {
+                                              "type": "string"
+                                            },
+                                            "pattern": {
+                                              "type": "string"
+                                            },
+                                            "action": {
+                                              "type": "string",
+                                              "enum": ["allow", "ask", "deny"]
+                                            }
+                                          },
+                                          "required": ["permission", "action"],
+                                          "additionalProperties": false
+                                        }
+                                      }
+                                    },
+                                    "additionalProperties": false
+                                  },
+                                  "capabilities": {
+                                    "type": "object",
+                                    "properties": {
+                                      "skills": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "mcpServers": {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string"
+                                        }
+                                      }
+                                    },
+                                    "required": ["skills", "mcpServers"],
+                                    "additionalProperties": false
+                                  },
+                                  "runtime": {
+                                    "type": "object",
+                                    "properties": {
+                                      "timeoutMs": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "retries": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "failure": {
+                                        "type": "string",
+                                        "enum": ["stop", "continue"]
+                                      },
+                                      "includeInFinalOutput": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "required": ["failure"],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "kind",
+                                  "source",
+                                  "position",
+                                  "overrides",
+                                  "capabilities",
+                                  "runtime"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "id": {
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "type": "string",
+                                    "enum": ["checkpoint"]
+                                  },
+                                  "position": {
+                                    "type": "object",
+                                    "properties": {
+                                      "x": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      },
+                                      "y": {
+                                        "anyOf": [
+                                          {
+                                            "type": "number"
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["NaN"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["-Infinity"]
+                                          },
+                                          {
+                                            "type": "string",
+                                            "enum": ["Infinity", "-Infinity", "NaN"]
+                                          }
+                                        ]
+                                      }
+                                    },
+                                    "required": ["x", "y"],
+                                    "additionalProperties": false
+                                  },
+                                  "prompt": {
+                                    "type": "string"
+                                  },
+                                  "options": {
+                                    "type": "array",
+                                    "items": {
+                                      "type": "object",
+                                      "properties": {
+                                        "id": {
+                                          "type": "string"
+                                        },
+                                        "label": {
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": ["id", "label"],
+                                      "additionalProperties": false
+                                    }
+                                  }
+                                },
+                                "required": ["id", "kind", "position", "prompt", "options"],
+                                "additionalProperties": false
+                              }
+                            ]
+                          }
+                        },
+                        "edges": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "from": {
+                                "type": "string"
+                              },
+                              "to": {
+                                "type": "string"
+                              },
+                              "route": {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": ["forward", "reprocess"]
+                                  },
+                                  "outcome": {
+                                    "type": "string"
+                                  },
+                                  "maxTraversals": {
+                                    "anyOf": [
+                                      {
+                                        "type": "number"
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["NaN"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["-Infinity"]
+                                      },
+                                      {
+                                        "type": "string",
+                                        "enum": ["Infinity", "-Infinity", "NaN"]
+                                      }
+                                    ]
+                                  },
+                                  "onLimit": {
+                                    "type": "string",
+                                    "enum": ["continue", "stop", "fail"]
+                                  }
+                                },
+                                "required": ["type"],
+                                "additionalProperties": false
+                              }
+                            },
+                            "required": ["id", "from", "to", "route"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "updatedAt": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "version",
+                        "entryNodeId",
+                        "outputNodeId",
+                        "nodes",
+                        "edges",
+                        "updatedAt"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "directory": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+                    },
+                    "input": {
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "nodeId": {
+                              "type": "string"
+                            },
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "status": {
+                              "type": "string",
+                              "enum": ["queued", "running", "completed", "failed", "cancelled"]
+                            },
+                            "attempts": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "output": {
+                              "type": "string"
+                            },
+                            "error": {
+                              "type": "string"
+                            },
+                            "sessionID": {
+                              "type": "string"
+                            },
+                            "startedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "finishedAt": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            }
+                          },
+                          "required": ["nodeId", "round", "status", "attempts"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "edges": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "traversals": {
+                            "anyOf": [
+                              {
+                                "type": "number"
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["NaN"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["-Infinity"]
+                              },
+                              {
+                                "type": "string",
+                                "enum": ["Infinity", "-Infinity", "NaN"]
+                              }
+                            ]
+                          }
+                        },
+                        "required": ["traversals"],
+                        "additionalProperties": false
+                      }
+                    },
+                    "checkpoints": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "round": {
+                              "anyOf": [
+                                {
+                                  "type": "number"
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["NaN"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["-Infinity"]
+                                },
+                                {
+                                  "type": "string",
+                                  "enum": ["Infinity", "-Infinity", "NaN"]
+                                }
+                              ]
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "feedback": {
+                              "type": "string"
+                            }
+                          },
+                          "required": ["round", "outcome"],
+                          "additionalProperties": false
+                        }
+                      }
+                    },
+                    "waiting": {
+                      "type": "object",
+                      "properties": {
+                        "nodeId": {
+                          "type": "string"
+                        },
+                        "round": {
+                          "anyOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["NaN"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["-Infinity"]
+                            },
+                            {
+                              "type": "string",
+                              "enum": ["Infinity", "-Infinity", "NaN"]
+                            }
+                          ]
+                        },
+                        "prompt": {
+                          "type": "string"
+                        },
+                        "options": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "label": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        }
+                      },
+                      "required": ["nodeId", "round", "prompt", "options"],
+                      "additionalProperties": false
+                    },
+                    "createdAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "updatedAt": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "revision": {
+                      "anyOf": [
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["NaN"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["-Infinity"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["Infinity", "-Infinity", "NaN"]
+                        }
+                      ]
+                    },
+                    "error": {
+                      "type": "string"
+                    },
+                    "output": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "graphId",
+                    "graphName",
+                    "graph",
+                    "status",
+                    "input",
+                    "nodes",
+                    "edges",
+                    "checkpoints",
+                    "createdAt",
+                    "updatedAt",
+                    "revision"
+                  ],
+                  "additionalProperties": false,
+                  "description": "Resumed orchestration run"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "OrchestrationRunNotFoundError | OrchestrationInvalidCheckpointError",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/OrchestrationRunNotFoundError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/OrchestrationInvalidCheckpointError"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "Resolve orchestration checkpoint",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nodeId": {
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "type": "string"
+                  },
+                  "feedback": {
+                    "type": "string"
+                  }
+                },
+                "required": ["nodeId", "outcome"],
+                "additionalProperties": false
+              }
+            }
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "js",
+            "source": "import { createKiloClient } from \"@kilocode/sdk\"\n\nconst client = createKiloClient()\nawait client.orchestration.checkpoint({\n  ...\n})"
+          }
+        ]
+      }
+    },
     "/network": {
       "get": {
         "tags": ["network"],
@@ -26001,6 +30183,9 @@
             "$ref": "#/components/schemas/EventIndexingWarning"
           },
           {
+            "$ref": "#/components/schemas/EventOrchestrationRunUpdated1"
+          },
+          {
             "$ref": "#/components/schemas/EventModels-devRefreshed"
           },
           {
@@ -29142,6 +33327,9 @@
               },
               {
                 "$ref": "#/components/schemas/EventIndexingWarning"
+              },
+              {
+                "$ref": "#/components/schemas/EventOrchestrationRunUpdated"
               },
               {
                 "$ref": "#/components/schemas/EventModels-devRefreshed"
@@ -39449,6 +43637,73 @@
         "required": ["operation", "message"],
         "additionalProperties": false
       },
+      "OrchestrationInvalidGraphError": {
+        "type": "object",
+        "properties": {
+          "_tag": {
+            "type": "string",
+            "enum": ["OrchestrationInvalidGraphError"]
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "nodeId": {
+                  "type": "string"
+                },
+                "edgeId": {
+                  "type": "string"
+                }
+              },
+              "required": ["code", "message"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["_tag", "issues"],
+        "additionalProperties": false
+      },
+      "OrchestrationRunNotFoundError": {
+        "type": "object",
+        "properties": {
+          "_tag": {
+            "type": "string",
+            "enum": ["OrchestrationRunNotFoundError"]
+          },
+          "runID": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "runID", "message"],
+        "additionalProperties": false
+      },
+      "OrchestrationInvalidCheckpointError": {
+        "type": "object",
+        "properties": {
+          "_tag": {
+            "type": "string",
+            "enum": ["OrchestrationInvalidCheckpointError"]
+          },
+          "runID": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": ["_tag", "runID", "message"],
+        "additionalProperties": false
+      },
       "KilocodeSessionImportResult": {
         "type": "object",
         "properties": {
@@ -42290,6 +46545,60 @@
           },
           "properties": {
             "$ref": "#/components/schemas/IndexingWarning"
+          }
+        },
+        "required": ["id", "type", "properties"],
+        "additionalProperties": false
+      },
+      "EventOrchestrationRunUpdated": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["orchestration.run.updated"]
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "runID": {
+                "type": "string"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["NaN"]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["Infinity"]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["-Infinity"]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["Infinity", "-Infinity", "NaN"]
+                  }
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+              }
+            },
+            "required": ["runID", "revision", "event", "status"],
+            "additionalProperties": false
           }
         },
         "required": ["id", "type", "properties"],
@@ -58394,6 +62703,56 @@
         "required": ["id", "type", "properties"],
         "additionalProperties": false
       },
+      "EventOrchestrationRunUpdated1": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["orchestration.run.updated"]
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "runID": {
+                "type": "string"
+              },
+              "revision": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["NaN"]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["Infinity"]
+                  },
+                  {
+                    "type": "string",
+                    "enum": ["-Infinity"]
+                  }
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["running", "waiting-for-user", "completed", "failed", "cancelled"]
+              }
+            },
+            "required": ["runID", "revision", "event", "status"],
+            "additionalProperties": false
+          }
+        },
+        "required": ["id", "type", "properties"],
+        "additionalProperties": false
+      },
       "EventTuiToastShow2": {
         "type": "object",
         "properties": {
@@ -58665,6 +63024,10 @@
     {
       "name": "anaconda-desktop",
       "description": "Local Anaconda Desktop provider setup routes."
+    },
+    {
+      "name": "kilo HttpApi",
+      "description": "Kilo HttpApi surface."
     },
     {
       "name": "network",

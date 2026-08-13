@@ -3,6 +3,7 @@ import { KiloProvider } from "./KiloProvider"
 import { AgentManagerProvider } from "./agent-manager/AgentManagerProvider"
 import { VscodeHost } from "./agent-manager/vscode-host"
 import { KiloClawProvider } from "./kiloclaw/KiloClawProvider"
+import { OrchestrationProvider } from "./orchestration/OrchestrationProvider"
 import { DiffViewerProvider } from "./diff/DiffViewerProvider"
 import { DiffSourceCatalog } from "./diff/sources/catalog"
 import { DiffVirtualProvider } from "./DiffVirtualProvider"
@@ -158,6 +159,10 @@ export function activate(context: vscode.ExtensionContext) {
   const kiloClawProvider = new KiloClawProvider(context.extensionUri, connectionService)
   context.subscriptions.push(kiloClawProvider)
 
+  // Create Orchestration editor provider (visual agent pipeline canvas)
+  const orchestrationProvider = new OrchestrationProvider(context.extensionUri, connectionService)
+  context.subscriptions.push(orchestrationProvider)
+
   // Create Agent Manager provider for editor panel
   const agentManagerHost = new VscodeHost(context.extensionUri, connectionService, context, remoteService)
   const git = createGitExecutable({
@@ -231,6 +236,16 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.registerWebviewPanelSerializer(KiloClawProvider.viewType, {
       deserializeWebviewPanel(panel: vscode.WebviewPanel) {
         kiloClawProvider.restorePanel(panel)
+        return Promise.resolve()
+      },
+    }),
+  )
+
+  // Register serializer so the Orchestration panel restores when VS Code restarts
+  context.subscriptions.push(
+    vscode.window.registerWebviewPanelSerializer(OrchestrationProvider.viewType, {
+      deserializeWebviewPanel(panel: vscode.WebviewPanel) {
+        orchestrationProvider.deserializePanel(panel)
         return Promise.resolve()
       },
     }),
@@ -391,6 +406,12 @@ export function activate(context: vscode.ExtensionContext) {
     }),
     vscode.commands.registerCommand("kilo-code.new.kiloClawOpen", () => {
       kiloClawProvider.openPanel()
+    }),
+    vscode.commands.registerCommand("kilo-code.new.orchestrationOpen", () => {
+      orchestrationProvider.openPanel()
+    }),
+    vscode.commands.registerCommand("kilo-code.new.sidebarTitle.orchestrationOpen", () => {
+      orchestrationProvider.openPanel()
     }),
     vscode.commands.registerCommand("kilo-code.new.historyButtonClicked", () => {
       const tab = activeTabProvider()

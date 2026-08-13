@@ -46,6 +46,7 @@ import {
   sameDirectory,
   SessionStreamScheduler,
   buildSettingPath,
+  mapAgent,
   type SessionRefreshContext,
 } from "./kilo-provider-utils"
 import { GitOps } from "./agent-manager/GitOps"
@@ -161,7 +162,6 @@ import {
 import type { StoredProviderKey } from "./provider-actions"
 import { AnacondaDesktopBridge } from "./anaconda-desktop/bridge"
 import { fetchOpenAIModels, FetchModelsError } from "./shared/fetch-models"
-import type { Agent } from "@kilocode/sdk/v2/client"
 import { configFeatures } from "./features"
 import { fetchSnapshot } from "./kilo-provider/config-snapshot"
 import { createAutoApproveBridge } from "./kilo-provider/auto-approve"
@@ -192,6 +192,8 @@ import {
   buildAutoApprovalReasonSettingMessage,
   watchAutoApprovalReasonConfig,
 } from "./kilo-provider/auto-approval-reason-settings"
+import { OrchestrationBridge } from "./orchestration/bridge"
+import type { OrchestrationRequest } from "./orchestration/messages"
 
 let maxCost = 0
 
@@ -216,20 +218,6 @@ function sandboxClient(client: KiloClient | null) {
   const sandbox = client?.sandbox
   return sandbox as (typeof sandbox & SandboxSupportClient) | undefined
 }
-
-// Helper to map agent data to the subset of fields sent to the webview
-const mapAgent = (a: Agent) => ({
-  name: a.name,
-  displayName: a.displayName,
-  description: a.description,
-  mode: a.mode,
-  native: a.native,
-  hidden: a.hidden,
-  color: a.color,
-  deprecated: a.deprecated,
-  permission: a.permission,
-  model: a.model,
-})
 
 // message.part.* events are always session-scoped; drop them when the session is unknown.
 const SESSION_SCOPED_PART_EVENTS = new Set(["message.part.updated", "message.part.delta", "message.part.removed"])
@@ -407,6 +395,31 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     post: (message) => this.postMessage(message),
   })
   private unsubscribeEvent: (() => void) | null = null
+  private orchestrationConfig: string | undefined
+  private readonly orchestration = new OrchestrationBridge({
+    client: () => this.connectionService.getClient(),
+    directory: () => this.getWorkspaceDirectory(this.currentSession?.id),
+    configDir: async () => {
+      if (this.orchestrationConfig) return this.orchestrationConfig
+      const client = this.connectionService.getClient()
+      const { data } = await client.path.get(
+        { directory: this.getWorkspaceDirectory(this.currentSession?.id) },
+        { throwOnError: true },
+      )
+      this.orchestrationConfig = data.config
+      return data.config
+    },
+    agents: async () => {
+      const client = this.connectionService.getClient()
+      const { data } = await client.app.agents(
+        { directory: this.getWorkspaceDirectory(this.currentSession?.id) },
+        { throwOnError: true },
+      )
+      return data.map((agent) => agent.name)
+    },
+    post: (message) => this.postMessage(message),
+    refreshAgents: () => this.fetchAndSendAgents(),
+  })
   private unsubscribeState: (() => void) | null = null
   /** Cached migration data so migration doesn't re-read from disk/SecretStorage. */ // legacy-migration
   private migrationCache: MigrationContext["migrationCache"] = new Map()
@@ -1043,6 +1056,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           openSessions: (ids) => this.trackOpenSessions(ids),
           speechToTextModels: () => this.fetchAndSendSpeechToTextModels(),
           modelUsage: (msg) => handleModelUsageMessage(msg, this.extensionContext, (value) => this.postMessage(value)),
+          orchestration: (message) => this.orchestration.handle(message as OrchestrationRequest),
         })
       ) {
         return
@@ -1692,6 +1706,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
           if (!directory && isEventFromForeignProject(payload, this.projectID)) return false
           const event = unwrapSyncEvent(payload)
           if (!event) return false
+          if (event.type === "orchestration.run.updated") return true
 
           // Remote status events are global and should always pass through
           if (event.type === "kilo-sessions.remote-status-changed") return true
@@ -1727,6 +1742,17 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         },
         (payload, directory) => {
           const event = unwrapSyncEvent(payload)
+          if (event?.type === "orchestration.run.updated") {
+            if (!this.orchestration.runId || this.orchestration.runId === event.properties.runID) {
+              this.orchestration.runId = event.properties.runID
+              this.postMessage({
+                type: "orchestration.runEvent",
+                runId: event.properties.runID,
+                revision: event.properties.revision,
+              })
+            }
+            return
+          }
           if (event) this.handleEvent(event, directory)
         },
       )

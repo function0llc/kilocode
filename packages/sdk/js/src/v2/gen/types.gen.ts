@@ -123,6 +123,7 @@ export type Event =
   | EventMemoryError1
   | EventIndexingStatus
   | EventIndexingWarning
+  | EventOrchestrationRunUpdated1
   | EventModelsDevRefreshed
   | EventIntegrationUpdated
   | EventIntegrationConnectionUpdated
@@ -1167,6 +1168,7 @@ export type GlobalEvent = {
     | EventMemoryError
     | EventIndexingStatus
     | EventIndexingWarning
+    | EventOrchestrationRunUpdated
     | EventModelsDevRefreshed
     | EventIntegrationUpdated
     | EventIntegrationConnectionUpdated
@@ -4449,6 +4451,28 @@ export type AnacondaDesktopOperationError = {
   message: string
 }
 
+export type OrchestrationInvalidGraphError = {
+  _tag: "OrchestrationInvalidGraphError"
+  issues: Array<{
+    code: string
+    message: string
+    nodeId?: string
+    edgeId?: string
+  }>
+}
+
+export type OrchestrationRunNotFoundError = {
+  _tag: "OrchestrationRunNotFoundError"
+  runID: string
+  message: string
+}
+
+export type OrchestrationInvalidCheckpointError = {
+  _tag: "OrchestrationInvalidCheckpointError"
+  runID: string
+  message: string
+}
+
 export type KilocodeSessionImportResult = {
   ok: boolean
   id: string
@@ -5150,6 +5174,17 @@ export type EventIndexingWarning = {
   id: string
   type: "indexing.warning"
   properties: IndexingWarning
+}
+
+export type EventOrchestrationRunUpdated = {
+  id: string
+  type: "orchestration.run.updated"
+  properties: {
+    runID: string
+    revision: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    event: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
+  }
 }
 
 export type EventModelsDevRefreshed = {
@@ -10287,6 +10322,17 @@ export type EventMemoryError1 = {
       sources?: Array<string>
       files?: Array<string>
     }
+  }
+}
+
+export type EventOrchestrationRunUpdated1 = {
+  id: string
+  type: "orchestration.run.updated"
+  properties: {
+    runID: string
+    revision: number | "NaN" | "Infinity" | "-Infinity"
+    event: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
   }
 }
 
@@ -17016,6 +17062,711 @@ export type AnacondaDesktopSyncResponses = {
 }
 
 export type AnacondaDesktopSyncResponse = AnacondaDesktopSyncResponses[keyof AnacondaDesktopSyncResponses]
+
+export type OrchestrationStartData = {
+  body?: {
+    graph: {
+      id: string
+      name: string
+      version: 2
+      entryNodeId: string
+      outputNodeId: string
+      nodes: Array<
+        | {
+            id: string
+            kind: "agent"
+            source: {
+              agentName: string
+            }
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            overrides: {
+              displayName?: string
+              description?: string
+              model?: {
+                providerID: string
+                modelID: string
+              }
+              variant?: string
+              prompt?: {
+                mode: "inherit" | "append" | "replace"
+                text?: string
+              }
+              temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              permission?: Array<{
+                permission: string
+                pattern?: string
+                action: "allow" | "ask" | "deny"
+              }>
+            }
+            capabilities: {
+              skills: Array<string>
+              mcpServers: Array<string>
+            }
+            runtime: {
+              timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              failure: "stop" | "continue"
+              includeInFinalOutput?: boolean
+            }
+          }
+        | {
+            id: string
+            kind: "checkpoint"
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            prompt: string
+            options: Array<{
+              id: string
+              label: string
+            }>
+          }
+      >
+      edges: Array<{
+        id: string
+        from: string
+        to: string
+        route: {
+          type: "forward" | "reprocess"
+          outcome?: string
+          maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+          onLimit?: "continue" | "stop" | "fail"
+        }
+      }>
+      updatedAt: string
+    }
+    input: string
+    concurrency?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/kilocode/orchestration/run"
+}
+
+export type OrchestrationStartErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * OrchestrationInvalidGraphError
+   */
+  500: OrchestrationInvalidGraphError
+}
+
+export type OrchestrationStartError = OrchestrationStartErrors[keyof OrchestrationStartErrors]
+
+export type OrchestrationStartResponses = {
+  /**
+   * Orchestration run
+   */
+  200: {
+    id: string
+    graphId: string
+    graphName: string
+    graph: {
+      id: string
+      name: string
+      version: 2
+      entryNodeId: string
+      outputNodeId: string
+      nodes: Array<
+        | {
+            id: string
+            kind: "agent"
+            source: {
+              agentName: string
+            }
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            overrides: {
+              displayName?: string
+              description?: string
+              model?: {
+                providerID: string
+                modelID: string
+              }
+              variant?: string
+              prompt?: {
+                mode: "inherit" | "append" | "replace"
+                text?: string
+              }
+              temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              permission?: Array<{
+                permission: string
+                pattern?: string
+                action: "allow" | "ask" | "deny"
+              }>
+            }
+            capabilities: {
+              skills: Array<string>
+              mcpServers: Array<string>
+            }
+            runtime: {
+              timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              failure: "stop" | "continue"
+              includeInFinalOutput?: boolean
+            }
+          }
+        | {
+            id: string
+            kind: "checkpoint"
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            prompt: string
+            options: Array<{
+              id: string
+              label: string
+            }>
+          }
+      >
+      edges: Array<{
+        id: string
+        from: string
+        to: string
+        route: {
+          type: "forward" | "reprocess"
+          outcome?: string
+          maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+          onLimit?: "continue" | "stop" | "fail"
+        }
+      }>
+      updatedAt: string
+    }
+    directory?: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
+    input: string
+    nodes: {
+      [key: string]: Array<{
+        nodeId: string
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        status: "queued" | "running" | "completed" | "failed" | "cancelled"
+        attempts: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        output?: string
+        error?: string
+        sessionID?: string
+        startedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        finishedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }>
+    }
+    edges: {
+      [key: string]: {
+        traversals: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }
+    }
+    checkpoints: {
+      [key: string]: Array<{
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        outcome: string
+        feedback?: string
+      }>
+    }
+    waiting?: {
+      nodeId: string
+      round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      prompt: string
+      options: Array<{
+        id: string
+        label: string
+      }>
+    }
+    createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    updatedAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    revision: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    error?: string
+    output?: string
+  }
+}
+
+export type OrchestrationStartResponse = OrchestrationStartResponses[keyof OrchestrationStartResponses]
+
+export type OrchestrationGetData = {
+  body?: never
+  path: {
+    runID: string
+  }
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/kilocode/orchestration/run/{runID}"
+}
+
+export type OrchestrationGetErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * OrchestrationRunNotFoundError
+   */
+  500: OrchestrationRunNotFoundError
+}
+
+export type OrchestrationGetError = OrchestrationGetErrors[keyof OrchestrationGetErrors]
+
+export type OrchestrationGetResponses = {
+  /**
+   * Orchestration run
+   */
+  200: {
+    id: string
+    graphId: string
+    graphName: string
+    graph: {
+      id: string
+      name: string
+      version: 2
+      entryNodeId: string
+      outputNodeId: string
+      nodes: Array<
+        | {
+            id: string
+            kind: "agent"
+            source: {
+              agentName: string
+            }
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            overrides: {
+              displayName?: string
+              description?: string
+              model?: {
+                providerID: string
+                modelID: string
+              }
+              variant?: string
+              prompt?: {
+                mode: "inherit" | "append" | "replace"
+                text?: string
+              }
+              temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              permission?: Array<{
+                permission: string
+                pattern?: string
+                action: "allow" | "ask" | "deny"
+              }>
+            }
+            capabilities: {
+              skills: Array<string>
+              mcpServers: Array<string>
+            }
+            runtime: {
+              timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              failure: "stop" | "continue"
+              includeInFinalOutput?: boolean
+            }
+          }
+        | {
+            id: string
+            kind: "checkpoint"
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            prompt: string
+            options: Array<{
+              id: string
+              label: string
+            }>
+          }
+      >
+      edges: Array<{
+        id: string
+        from: string
+        to: string
+        route: {
+          type: "forward" | "reprocess"
+          outcome?: string
+          maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+          onLimit?: "continue" | "stop" | "fail"
+        }
+      }>
+      updatedAt: string
+    }
+    directory?: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
+    input: string
+    nodes: {
+      [key: string]: Array<{
+        nodeId: string
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        status: "queued" | "running" | "completed" | "failed" | "cancelled"
+        attempts: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        output?: string
+        error?: string
+        sessionID?: string
+        startedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        finishedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }>
+    }
+    edges: {
+      [key: string]: {
+        traversals: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }
+    }
+    checkpoints: {
+      [key: string]: Array<{
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        outcome: string
+        feedback?: string
+      }>
+    }
+    waiting?: {
+      nodeId: string
+      round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      prompt: string
+      options: Array<{
+        id: string
+        label: string
+      }>
+    }
+    createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    updatedAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    revision: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    error?: string
+    output?: string
+  }
+}
+
+export type OrchestrationGetResponse = OrchestrationGetResponses[keyof OrchestrationGetResponses]
+
+export type OrchestrationCancelData = {
+  body?: never
+  path: {
+    runID: string
+  }
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/kilocode/orchestration/run/{runID}/cancel"
+}
+
+export type OrchestrationCancelErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * OrchestrationRunNotFoundError
+   */
+  500: OrchestrationRunNotFoundError
+}
+
+export type OrchestrationCancelError = OrchestrationCancelErrors[keyof OrchestrationCancelErrors]
+
+export type OrchestrationCancelResponses = {
+  /**
+   * Cancelled orchestration run
+   */
+  200: {
+    id: string
+    graphId: string
+    graphName: string
+    graph: {
+      id: string
+      name: string
+      version: 2
+      entryNodeId: string
+      outputNodeId: string
+      nodes: Array<
+        | {
+            id: string
+            kind: "agent"
+            source: {
+              agentName: string
+            }
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            overrides: {
+              displayName?: string
+              description?: string
+              model?: {
+                providerID: string
+                modelID: string
+              }
+              variant?: string
+              prompt?: {
+                mode: "inherit" | "append" | "replace"
+                text?: string
+              }
+              temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              permission?: Array<{
+                permission: string
+                pattern?: string
+                action: "allow" | "ask" | "deny"
+              }>
+            }
+            capabilities: {
+              skills: Array<string>
+              mcpServers: Array<string>
+            }
+            runtime: {
+              timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              failure: "stop" | "continue"
+              includeInFinalOutput?: boolean
+            }
+          }
+        | {
+            id: string
+            kind: "checkpoint"
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            prompt: string
+            options: Array<{
+              id: string
+              label: string
+            }>
+          }
+      >
+      edges: Array<{
+        id: string
+        from: string
+        to: string
+        route: {
+          type: "forward" | "reprocess"
+          outcome?: string
+          maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+          onLimit?: "continue" | "stop" | "fail"
+        }
+      }>
+      updatedAt: string
+    }
+    directory?: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
+    input: string
+    nodes: {
+      [key: string]: Array<{
+        nodeId: string
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        status: "queued" | "running" | "completed" | "failed" | "cancelled"
+        attempts: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        output?: string
+        error?: string
+        sessionID?: string
+        startedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        finishedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }>
+    }
+    edges: {
+      [key: string]: {
+        traversals: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }
+    }
+    checkpoints: {
+      [key: string]: Array<{
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        outcome: string
+        feedback?: string
+      }>
+    }
+    waiting?: {
+      nodeId: string
+      round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      prompt: string
+      options: Array<{
+        id: string
+        label: string
+      }>
+    }
+    createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    updatedAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    revision: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    error?: string
+    output?: string
+  }
+}
+
+export type OrchestrationCancelResponse = OrchestrationCancelResponses[keyof OrchestrationCancelResponses]
+
+export type OrchestrationCheckpointData = {
+  body?: {
+    nodeId: string
+    outcome: string
+    feedback?: string
+  }
+  path: {
+    runID: string
+  }
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/kilocode/orchestration/run/{runID}/checkpoint"
+}
+
+export type OrchestrationCheckpointErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+  /**
+   * OrchestrationRunNotFoundError | OrchestrationInvalidCheckpointError
+   */
+  500: OrchestrationRunNotFoundError | OrchestrationInvalidCheckpointError
+}
+
+export type OrchestrationCheckpointError = OrchestrationCheckpointErrors[keyof OrchestrationCheckpointErrors]
+
+export type OrchestrationCheckpointResponses = {
+  /**
+   * Resumed orchestration run
+   */
+  200: {
+    id: string
+    graphId: string
+    graphName: string
+    graph: {
+      id: string
+      name: string
+      version: 2
+      entryNodeId: string
+      outputNodeId: string
+      nodes: Array<
+        | {
+            id: string
+            kind: "agent"
+            source: {
+              agentName: string
+            }
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            overrides: {
+              displayName?: string
+              description?: string
+              model?: {
+                providerID: string
+                modelID: string
+              }
+              variant?: string
+              prompt?: {
+                mode: "inherit" | "append" | "replace"
+                text?: string
+              }
+              temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              permission?: Array<{
+                permission: string
+                pattern?: string
+                action: "allow" | "ask" | "deny"
+              }>
+            }
+            capabilities: {
+              skills: Array<string>
+              mcpServers: Array<string>
+            }
+            runtime: {
+              timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              failure: "stop" | "continue"
+              includeInFinalOutput?: boolean
+            }
+          }
+        | {
+            id: string
+            kind: "checkpoint"
+            position: {
+              x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            }
+            prompt: string
+            options: Array<{
+              id: string
+              label: string
+            }>
+          }
+      >
+      edges: Array<{
+        id: string
+        from: string
+        to: string
+        route: {
+          type: "forward" | "reprocess"
+          outcome?: string
+          maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+          onLimit?: "continue" | "stop" | "fail"
+        }
+      }>
+      updatedAt: string
+    }
+    directory?: string
+    status: "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
+    input: string
+    nodes: {
+      [key: string]: Array<{
+        nodeId: string
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        status: "queued" | "running" | "completed" | "failed" | "cancelled"
+        attempts: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        output?: string
+        error?: string
+        sessionID?: string
+        startedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        finishedAt?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }>
+    }
+    edges: {
+      [key: string]: {
+        traversals: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      }
+    }
+    checkpoints: {
+      [key: string]: Array<{
+        round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+        outcome: string
+        feedback?: string
+      }>
+    }
+    waiting?: {
+      nodeId: string
+      round: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+      prompt: string
+      options: Array<{
+        id: string
+        label: string
+      }>
+    }
+    createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    updatedAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    revision: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    error?: string
+    output?: string
+  }
+}
+
+export type OrchestrationCheckpointResponse = OrchestrationCheckpointResponses[keyof OrchestrationCheckpointResponses]
 
 export type NetworkListData = {
   body?: never

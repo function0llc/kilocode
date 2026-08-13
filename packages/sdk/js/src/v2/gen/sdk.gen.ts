@@ -277,6 +277,14 @@ import type {
   NotebookFailure,
   NotebookRequestId,
   NotebookResult,
+  OrchestrationCancelErrors,
+  OrchestrationCancelResponses,
+  OrchestrationCheckpointErrors,
+  OrchestrationCheckpointResponses,
+  OrchestrationGetErrors,
+  OrchestrationGetResponses,
+  OrchestrationStartErrors,
+  OrchestrationStartResponses,
   OutputFormat,
   Part as Part2,
   PartDeleteErrors,
@@ -8427,6 +8435,229 @@ export class AnacondaDesktop extends HeyApiClient {
   }
 }
 
+export class Orchestration extends HeyApiClient {
+  /**
+   * Start orchestration run
+   */
+  public start<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      graph?: {
+        id: string
+        name: string
+        version: 2
+        entryNodeId: string
+        outputNodeId: string
+        nodes: Array<
+          | {
+              id: string
+              kind: "agent"
+              source: {
+                agentName: string
+              }
+              position: {
+                x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              }
+              overrides: {
+                displayName?: string
+                description?: string
+                model?: {
+                  providerID: string
+                  modelID: string
+                }
+                variant?: string
+                prompt?: {
+                  mode: "inherit" | "append" | "replace"
+                  text?: string
+                }
+                temperature?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                topP?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                steps?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                permission?: Array<{
+                  permission: string
+                  pattern?: string
+                  action: "allow" | "ask" | "deny"
+                }>
+              }
+              capabilities: {
+                skills: Array<string>
+                mcpServers: Array<string>
+              }
+              runtime: {
+                timeoutMs?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                retries?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                failure: "stop" | "continue"
+                includeInFinalOutput?: boolean
+              }
+            }
+          | {
+              id: string
+              kind: "checkpoint"
+              position: {
+                x: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+                y: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+              }
+              prompt: string
+              options: Array<{
+                id: string
+                label: string
+              }>
+            }
+        >
+        edges: Array<{
+          id: string
+          from: string
+          to: string
+          route: {
+            type: "forward" | "reprocess"
+            outcome?: string
+            maxTraversals?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+            onLimit?: "continue" | "stop" | "fail"
+          }
+        }>
+        updatedAt: string
+      }
+      input?: string
+      concurrency?: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "graph" },
+            { in: "body", key: "input" },
+            { in: "body", key: "concurrency" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<OrchestrationStartResponses, OrchestrationStartErrors, ThrowOnError>({
+      url: "/kilocode/orchestration/run",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Get orchestration run
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters: {
+      runID: string
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "runID" },
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<OrchestrationGetResponses, OrchestrationGetErrors, ThrowOnError>({
+      url: "/kilocode/orchestration/run/{runID}",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Cancel orchestration run
+   */
+  public cancel<ThrowOnError extends boolean = false>(
+    parameters: {
+      runID: string
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "runID" },
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<OrchestrationCancelResponses, OrchestrationCancelErrors, ThrowOnError>(
+      {
+        url: "/kilocode/orchestration/run/{runID}/cancel",
+        ...options,
+        ...params,
+      },
+    )
+  }
+
+  /**
+   * Resolve orchestration checkpoint
+   */
+  public checkpoint<ThrowOnError extends boolean = false>(
+    parameters: {
+      runID: string
+      directory?: string
+      workspace?: string
+      nodeId?: string
+      outcome?: string
+      feedback?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "path", key: "runID" },
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "nodeId" },
+            { in: "body", key: "outcome" },
+            { in: "body", key: "feedback" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<
+      OrchestrationCheckpointResponses,
+      OrchestrationCheckpointErrors,
+      ThrowOnError
+    >({
+      url: "/kilocode/orchestration/run/{runID}/checkpoint",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+}
+
 export class Network extends HeyApiClient {
   /**
    * List pending network waits
@@ -11506,6 +11737,11 @@ export class KiloClient extends HeyApiClient {
   private _anacondaDesktop?: AnacondaDesktop
   get anacondaDesktop(): AnacondaDesktop {
     return (this._anacondaDesktop ??= new AnacondaDesktop({ client: this.client }))
+  }
+
+  private _orchestration?: Orchestration
+  get orchestration(): Orchestration {
+    return (this._orchestration ??= new Orchestration({ client: this.client }))
   }
 
   private _network?: Network

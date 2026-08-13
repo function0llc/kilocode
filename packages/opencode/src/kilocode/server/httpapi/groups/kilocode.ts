@@ -25,6 +25,7 @@ import {
 import { ModelUsage } from "@/kilocode/session/model-usage"
 import { SessionID } from "@/session/schema"
 import { CommandFiles } from "@/kilocode/command-files"
+import { OrchestrationApi } from "./orchestration"
 
 const root = "/kilocode"
 
@@ -233,6 +234,7 @@ export const KilocodeApi = HttpApi.make("kilocode")
       .middleware(Authorization),
   )
   .addHttpApi(AnacondaDesktopApi)
+  .addHttpApi(OrchestrationApi)
   .annotateMerge(
     OpenApi.annotations({
       title: "kilo HttpApi",

@@ -21,6 +21,7 @@ type Ctx = {
   openSessions: (ids: string[]) => void
   speechToTextModels: () => Promise<void>
   modelUsage: (message: ModelUsageMessage) => Promise<void>
+  orchestration: (message: { type: string }) => Promise<void>
 }
 
 export async function routeEarlyMessage(
@@ -43,6 +44,10 @@ export async function routeEarlyMessage(
           error: err instanceof Error ? err.message : String(err),
         }),
     )
+    return true
+  }
+  if (message.type.startsWith("orchestration.")) {
+    await ctx.orchestration(message)
     return true
   }
   if (message.type === "recordModelUsage" || message.type === "requestModelUsage") {

@@ -1,4 +1,5 @@
 import type { ProviderAuthAuthorization, ProviderAuthMethod } from "@kilocode/sdk/v2/client"
+import type { OrchestrationResponse } from "./orchestration"
 import type { DiffSourceCapabilities, DiffSourceDescriptor } from "../../../../src/diff/sources/types"
 import type { PartBatch, PartRemove, PartUpdate } from "../../../../src/shared/stream-messages"
 import type { MarketplaceItem, MarketplaceInstalledMetadata, MarketplaceRelevanceMetadata } from "../marketplace"
@@ -1291,6 +1292,7 @@ export interface ClipboardWriteResultMessage {
 
 export type ExtensionMessage =
   | ReadyMessage
+  | OrchestrationResponse
   | FontSizeChangedMessage
   | GitStatusMessage
   | ConnectionStateMessage

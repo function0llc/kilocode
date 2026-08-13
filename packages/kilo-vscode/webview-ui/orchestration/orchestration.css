@@ -1,0 +1,844 @@
+/* Orchestration editor styles. Uses VS Code theme variables so the panel
+   follows the active color theme. Canvas/node layout is custom because
+   kilo-ui has no graph primitives. */
+
+.orch-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--vscode-editor-background);
+  color: var(--vscode-foreground);
+}
+
+.orch-settings {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--vscode-panel-border, transparent);
+  border-radius: 6px;
+  background-color: var(--vscode-editor-background);
+  align-self: stretch;
+}
+
+.settings-agent-behaviour-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden !important;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+}
+
+.settings-agent-behaviour-content > h3 {
+  flex: 0 0 auto;
+}
+
+.agent-behaviour.orchestration-active {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  overflow: hidden;
+}
+
+.agent-behaviour.orchestration-active .agent-behaviour-subtabs {
+  flex: 0 0 auto;
+}
+
+.orch-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+}
+
+/* ---------- Gallery ---------- */
+
+.orch-gallery {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.orch-gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+}
+
+.orch-gallery-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.orch-gallery-title h1 {
+  margin: 0;
+  font-size: var(--font-size-large);
+  font-weight: 600;
+}
+
+.orch-gallery-title p {
+  margin: 0;
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+}
+
+.orch-gallery-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px;
+}
+
+.orch-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.orch-gallery-empty {
+  color: var(--vscode-descriptionForeground);
+  padding: 40px 0;
+  text-align: center;
+}
+
+.orch-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--vscode-panel-border, var(--vscode-widget-border, transparent));
+  border-radius: 6px;
+  background-color: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+  cursor: pointer;
+  transition: border-color 0.1s ease;
+}
+
+.orch-card:hover {
+  border-color: var(--vscode-focusBorder);
+}
+
+.orch-card-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orch-card-meta {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+}
+
+.orch-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.orch-card-rename {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.orch-card-rename input {
+  flex: 1;
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 3px;
+  padding: 3px 6px;
+  font-size: var(--font-size-small);
+}
+
+/* ---------- Editor ---------- */
+
+.orch-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+  min-width: 0;
+}
+
+.orch-editor-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ---------- Toolbar ---------- */
+
+.orch-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+  background-color: var(--vscode-sideBar-background);
+  flex-wrap: wrap;
+}
+
+.orch-toolbar-name {
+  font-weight: 600;
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.orch-toolbar-name .name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orch-toolbar-dirty {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+  font-weight: 400;
+}
+
+.orch-toolbar-run {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: min(420px, 100%);
+}
+
+.orch-toolbar-run [data-component="text-field"] {
+  flex: 1;
+}
+
+.orch-run-status {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.orch-toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.orch-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background-color: var(--vscode-panel-border, var(--vscode-widget-border, transparent));
+  margin: 0 4px;
+}
+
+/* ---------- Palette ---------- */
+
+.orch-palette {
+  width: 220px;
+  min-width: 220px;
+  border-right: 1px solid var(--vscode-panel-border, transparent);
+  background-color: var(--vscode-sideBar-background);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.orch-palette-hint {
+  padding: 8px 12px;
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  line-height: 1.4;
+  border-bottom: 1px solid var(--vscode-panel-border, transparent);
+}
+
+.orch-palette-section {
+  padding: 6px 0;
+}
+
+.orch-palette-section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.orch-palette-section-header [data-slot="collapsible-arrow"] {
+  margin-left: auto;
+}
+
+.orch-palette-section [data-slot="collapsible-content"] {
+  overflow: hidden;
+}
+
+.orch-palette-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px 5px 18px;
+  cursor: grab;
+  font-size: var(--font-size-small);
+  user-select: none;
+}
+
+.orch-palette-item:hover {
+  background-color: var(--vscode-list-hover-background);
+}
+
+.orch-palette-item:active {
+  cursor: grabbing;
+}
+
+.orch-palette-drag-outline {
+  position: fixed;
+  z-index: 10000;
+  width: 184px;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 2px dashed var(--vscode-focusBorder);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--vscode-editor-background) 84%, transparent);
+  color: var(--vscode-foreground);
+  transform: translate(-50%, -50%);
+  box-sizing: border-box;
+  pointer-events: none;
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--vscode-widget-shadow, #000) 35%, transparent);
+}
+
+.orch-palette-drag-outline.capability {
+  width: auto;
+  min-width: 130px;
+  min-height: 36px;
+  padding: 8px 10px;
+}
+
+.orch-palette-item .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orch-palette-item .sub {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+}
+
+.orch-palette-empty {
+  padding: 6px 18px;
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  font-style: italic;
+}
+
+/* ---------- Canvas ---------- */
+
+.orch-canvas {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  background-color: var(--vscode-editor-background);
+  background-image: radial-gradient(var(--vscode-panel-border, rgba(128, 128, 128, 0.2)) 1px, transparent 1px);
+  background-size: 20px 20px;
+  touch-action: none;
+}
+
+.orch-canvas.drag-over {
+  outline: 2px dashed var(--vscode-focusBorder);
+  outline-offset: -2px;
+}
+
+.orch-canvas-placeholder {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--vscode-descriptionForeground);
+  pointer-events: none;
+  font-size: var(--font-size-base);
+}
+
+.orch-viewport {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  width: 0;
+  height: 0;
+}
+
+.orch-edges {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.orch-edge {
+  fill: none;
+  stroke: var(--vscode-descriptionForeground);
+  stroke-width: 2;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.orch-edge.reprocess {
+  stroke: var(--vscode-charts-orange, var(--vscode-descriptionForeground));
+  stroke-dasharray: 8 5;
+}
+
+.orch-edge.selected {
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 3;
+}
+
+.orch-edge.traversed {
+  stroke: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.orch-arrow-head {
+  fill: var(--vscode-descriptionForeground);
+}
+
+.orch-edge-loop-label {
+  fill: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  pointer-events: stroke;
+  cursor: pointer;
+  user-select: none;
+}
+
+.orch-edge-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 14;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+
+.orch-edge-control {
+  cursor: move;
+  pointer-events: all;
+}
+
+.orch-edge-control-halo {
+  fill: transparent;
+}
+
+.orch-edge-control-point {
+  fill: var(--vscode-editor-background);
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 2;
+}
+
+.orch-edge-control:hover .orch-edge-control-point {
+  fill: var(--vscode-focusBorder);
+}
+
+.orch-edge-ghost {
+  fill: none;
+  stroke: var(--vscode-focusBorder);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+  pointer-events: none;
+}
+
+/* ---------- Nodes ---------- */
+
+.orch-node {
+  position: absolute;
+  width: 184px;
+  min-height: 72px;
+  border: 1px solid var(--vscode-panel-border, var(--vscode-widget-border, transparent));
+  border-radius: 8px;
+  background-color: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+  padding: 8px 10px;
+  cursor: grab;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.orch-node:active {
+  cursor: grabbing;
+}
+
+.orch-node.selected {
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
+
+.orch-node.output {
+  outline: 2px solid var(--vscode-charts-green, var(--vscode-focusBorder));
+  outline-offset: 1px;
+}
+
+.orch-node.checkpoint {
+  border-style: dashed;
+}
+
+.orch-node.entry {
+  border-color: var(--vscode-charts-yellow, var(--vscode-focusBorder));
+}
+
+.orch-node.unresolved {
+  border-color: var(--vscode-errorForeground);
+  border-style: dashed;
+}
+
+.orch-node.queued {
+  border-color: var(--vscode-descriptionForeground);
+}
+
+.orch-node.running,
+.orch-node.waiting {
+  border-color: var(--vscode-progressBar-background, var(--vscode-focusBorder));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--vscode-progressBar-background, var(--vscode-focusBorder)) 25%, transparent);
+}
+
+.orch-node.completed {
+  border-color: var(--vscode-testing-iconPassed, #73c991);
+}
+
+.orch-node.failed {
+  border-color: var(--vscode-testing-iconFailed, #f14c4c);
+}
+
+.orch-node.cancelled {
+  opacity: 0.62;
+}
+
+.orch-node-run {
+  color: var(--vscode-descriptionForeground);
+  font-size: 10px;
+  margin-top: 3px;
+}
+
+.orch-checkpoint-bar,
+.orch-run-output {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-top: 1px solid var(--vscode-panel-border, transparent);
+  background: var(--vscode-editorWidget-background, var(--vscode-sideBar-background));
+}
+
+.orch-checkpoint-bar [data-component="text-field"] {
+  flex: 1;
+}
+
+.orch-checkpoint-options {
+  display: flex;
+  gap: 6px;
+}
+
+.orch-run-output {
+  align-items: flex-start;
+  max-height: 180px;
+}
+
+.orch-run-output pre {
+  flex: 1;
+  margin: 0;
+  overflow: auto;
+  white-space: pre-wrap;
+  font-family: var(--vscode-editor-font-family);
+}
+
+.orch-node-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.orch-node-name {
+  font-weight: 600;
+  font-size: var(--font-size-small);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+}
+
+.orch-node-kind {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+}
+
+.orch-node-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.orch-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: var(--vscode-badge-background);
+  color: var(--vscode-badge-foreground);
+  font-size: var(--font-size-x-small);
+  max-width: 100%;
+}
+
+.orch-badge .text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orch-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--vscode-editor-background);
+  border: 2px solid var(--vscode-descriptionForeground);
+  box-sizing: border-box;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.orch-handle.in {
+  top: -7px;
+  cursor: crosshair;
+}
+
+.orch-handle.out {
+  bottom: -7px;
+  cursor: crosshair;
+}
+
+.orch-handle:hover {
+  border-color: var(--vscode-focusBorder);
+  background-color: var(--vscode-focusBorder);
+}
+
+/* ---------- Inspector ---------- */
+
+.orch-inspector {
+  width: 100%;
+  min-width: 0;
+  background-color: var(--vscode-sideBar-background);
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.orch-inspector-shell {
+  position: relative;
+  display: flex;
+  min-width: 220px;
+  max-width: min(640px, calc(100% - 320px));
+  flex: 0 0 auto;
+  border-left: 1px solid var(--vscode-panel-border, transparent);
+  background-color: var(--vscode-sideBar-background);
+}
+
+.orch-inspector-resizer {
+  position: absolute;
+  z-index: 10;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 8px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.orch-inspector-resizer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 3px;
+  width: 2px;
+  background: transparent;
+}
+
+.orch-inspector-resizer:hover::after,
+.orch-inspector-resizer:focus-visible::after {
+  background: var(--vscode-focusBorder);
+}
+
+@media (max-width: 820px) {
+  .orch-palette {
+    width: 180px;
+    min-width: 180px;
+  }
+
+  .orch-inspector-shell {
+    max-width: 42%;
+  }
+}
+
+.orch-inspector h2 {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+}
+
+.orch-inspector-empty {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+}
+
+.orch-inspector-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.orch-inspector-label {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-x-small);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.orch-inspector-value {
+  font-size: var(--font-size-small);
+  word-break: break-word;
+}
+
+.orch-inspector-desc {
+  color: var(--vscode-descriptionForeground);
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.orch-inspector-cap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background-color: var(--vscode-editorWidget-background, var(--vscode-editor-background));
+  font-size: var(--font-size-small);
+}
+
+.orch-inspector-cap .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.orch-inspector-cap .label .text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.orch-inspector-warning {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  color: var(--vscode-errorForeground);
+  font-size: var(--font-size-small);
+  line-height: 1.4;
+  padding: 8px;
+  border: 1px solid var(--vscode-errorForeground);
+  border-radius: 6px;
+}
+
+.orch-inspector-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.orch-inspector-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.orch-inspector-input,
+.orch-inspector-select,
+.orch-inspector-textarea {
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border, transparent);
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: var(--font-size-small);
+  font-family: inherit;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.orch-inspector-textarea {
+  resize: vertical;
+  line-height: 1.4;
+}
+
+.orch-inspector-input:focus,
+.orch-inspector-select:focus,
+.orch-inspector-textarea:focus {
+  outline: 1px solid var(--vscode-focusBorder);
+  outline-offset: -1px;
+}
+
+.orch-palette-action {
+  cursor: pointer;
+}
+
+/* ---------- Connection / loading states ---------- */
+
+.orch-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 100%;
+  color: var(--vscode-descriptionForeground);
+}

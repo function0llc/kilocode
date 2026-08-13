@@ -761,6 +761,7 @@ export const dict = {
   "settings.aboutKiloCode.telemetry.openSettings": "Open Telemetry Settings",
 
   "settings.agentBehaviour.subtab.agents": "Agents",
+  "settings.agentBehaviour.subtab.orchestration": "Orchestration",
   "settings.agentBehaviour.subtab.mcpServers": "MCP Servers",
   "settings.agentBehaviour.subtab.rules": "Rules",
   "settings.agentBehaviour.subtab.workflows": "Workflows",

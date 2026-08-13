@@ -223,6 +223,28 @@ export function filterVisibleAgents(agents: Agent[]): { visible: Agent[]; defaul
   return { visible, defaultAgent }
 }
 
+/** Map an SDK agent to the subset of fields sent to webviews. */
+export const mapAgent = (a: Agent) => ({
+  name: a.name,
+  displayName: a.displayName,
+  description: a.description,
+  mode: a.mode,
+  native: a.native,
+  hidden: a.hidden,
+  color: a.color,
+  deprecated: a.deprecated,
+  permission: a.permission,
+  model: a.model,
+  variant: a.variant,
+  prompt: a.prompt,
+  temperature: a.temperature,
+  topP: a.topP,
+  steps: a.steps,
+  options: a.options,
+  requirements: a.requirements,
+  source: a.source,
+})
+
 /**
  * Shared interface for the subset of KiloProvider state needed by session-refresh helpers.
  * Extracted here so the logic can be tested without importing KiloProvider (and vscode).

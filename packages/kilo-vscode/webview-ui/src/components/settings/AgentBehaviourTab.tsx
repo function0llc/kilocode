@@ -18,11 +18,12 @@ import ModeEditView from "./ModeEditView"
 import ModeCreateView from "./ModeCreateView"
 import McpEditView from "./McpEditView"
 import WorkflowsTab from "./agent-behaviour/WorkflowsTab"
+import OrchestrationTab from "./OrchestrationTab"
 import { mcpConfigScope, mcpEnabledPatch, selectedDefaultAgentValue } from "./agent-behaviour-patches"
 import { parseImport, MAX_IMPORT_SIZE } from "./mode-io"
 import type { ImportError } from "./mode-io"
 
-type SubtabId = "agents" | "mcpServers" | "rules" | "workflows" | "skills"
+type SubtabId = "agents" | "orchestration" | "mcpServers" | "rules" | "workflows" | "skills"
 
 interface SubtabConfig {
   id: SubtabId
@@ -31,6 +32,7 @@ interface SubtabConfig {
 
 const subtabs: SubtabConfig[] = [
   { id: "agents", labelKey: "settings.agentBehaviour.subtab.agents" },
+  { id: "orchestration", labelKey: "settings.agentBehaviour.subtab.orchestration" },
   { id: "mcpServers", labelKey: "settings.agentBehaviour.subtab.mcpServers" },
   { id: "rules", labelKey: "settings.agentBehaviour.subtab.rules" },
   { id: "workflows", labelKey: "settings.agentBehaviour.subtab.workflows" },
@@ -1103,6 +1105,8 @@ const AgentBehaviourTab: Component = () => {
     switch (activeSubtab()) {
       case "agents":
         return renderAgentsSubtab()
+      case "orchestration":
+        return <OrchestrationTab />
       case "mcpServers":
         return renderMcpSubtab()
       case "rules":
@@ -1117,9 +1121,13 @@ const AgentBehaviourTab: Component = () => {
   }
 
   return (
-    <div>
+    <div
+      class="agent-behaviour"
+      classList={{ "orchestration-active": activeSubtab() === "orchestration" }}
+    >
       {/* Horizontal subtab bar */}
       <div
+        class="agent-behaviour-subtabs"
         style={{
           display: "flex",
           gap: "0",
