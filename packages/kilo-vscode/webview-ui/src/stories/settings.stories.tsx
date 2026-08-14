@@ -519,7 +519,7 @@ export const ModeEditExport: Story = {
       <StoryProviders sessionID="export-story" status="idle" config={{ agent: cfg } as any}>
         <SessionContext.Provider value={session as any}>
           <div style={{ width: "420px", height: "700px", overflow: "auto" }}>
-            <ModeEditView name="reviewer" onBack={noop} onRemove={noop} />
+            <ModeEditView name="reviewer" taken={["reviewer"]} onRename={noop} onBack={noop} onRemove={noop} />
           </div>
         </SessionContext.Provider>
       </StoryProviders>
@@ -564,7 +564,7 @@ export const ModeEditPermissions: Story = {
       >
         <SessionContext.Provider value={session as any}>
           <div style={{ width: "460px", height: "760px", overflow: "auto" }}>
-            <ModeEditView name="reviewer" onBack={noop} onRemove={noop} />
+            <ModeEditView name="reviewer" taken={["reviewer"]} onRename={noop} onBack={noop} onRemove={noop} />
           </div>
         </SessionContext.Provider>
       </StoryProviders>

@@ -285,7 +285,17 @@ const AgentBehaviourTab: Component = () => {
   const renderAgentsSubtab = () => {
     const view = agentView()
     if (view === "create") return <ModeCreateView taken={agentNames()} onBack={back} />
-    if (view === "edit") return <ModeEditView name={editingAgent()} onBack={back} onRemove={confirmRemoveMode} />
+    if (view === "edit") {
+      return (
+        <ModeEditView
+          name={editingAgent()}
+          taken={agentNames()}
+          onRename={setEditingAgent}
+          onBack={back}
+          onRemove={confirmRemoveMode}
+        />
+      )
+    }
 
     return (
       <div>

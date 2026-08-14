@@ -12,6 +12,7 @@ import {
   renameOrchestrationNodes,
   summarize,
   type GraphSummary,
+  type AgentRename,
   type OrchestrationGraph,
 } from "./domain"
 
@@ -130,4 +131,35 @@ export async function renameGraph(configDir: string, id: string, name: string): 
   const graph = await readGraph(configDir, id)
   if (!graph) return null
   return writeGraph(configDir, renameOrchestrationNodes({ ...graph, name }, graph.name))
+}
+
+export async function renameAgentReferences(configDir: string, renames: AgentRename[]): Promise<OrchestrationGraph[]> {
+  if (renames.length === 0) return []
+  const dir = dirFor(configDir)
+  const entries = await readdir(dir).catch(() => [])
+  const changed: OrchestrationGraph[] = []
+  for (const file of entries) {
+    if (!file.endsWith(".json")) continue
+    const graph = await readGraph(configDir, file.slice(0, -5))
+    if (!graph) continue
+    const next = renames.reduce((current, rename) => {
+      const own = rename.graphId === current.id
+      const nodes = current.nodes.map((node) => {
+        if (node.kind !== "agent" || node.source.agentName !== rename.from) return node
+        return {
+          ...node,
+          source: { agentName: rename.to },
+          overrides: {
+            ...node.overrides,
+            ...(own && node.overrides.displayName === current.name ? { displayName: rename.to } : {}),
+          },
+        }
+      })
+      if (!own && nodes.every((node, index) => node === current.nodes[index])) return current
+      return { ...current, ...(own ? { name: rename.to } : {}), nodes }
+    }, graph)
+    if (next === graph) continue
+    changed.push(await writeGraph(configDir, next))
+  }
+  return changed
 }

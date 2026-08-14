@@ -12,6 +12,7 @@ import {
   parseGraph,
   persistGraph,
   readGraph,
+  renameAgentReferences,
   renameGraph,
   safeId,
   uniqueId,
@@ -93,6 +94,43 @@ describe("orchestration graph storage", () => {
     const renamed = await renameGraph(configDir, graph.id, "After")
     expect(renamed?.name).toBe("After")
     expect((await readGraph(configDir, graph.id))?.name).toBe("After")
+  })
+
+  it("renames agent references across stored graphs", async () => {
+    await writeGraph(
+      configDir,
+      seed("One", { id: "one", nodes: [createAgentNode("a", "reviewer-old", { x: 0, y: 0 })] }),
+    )
+    await writeGraph(
+      configDir,
+      seed("Two", { id: "two", nodes: [createAgentNode("b", "reviewer-old", { x: 0, y: 0 })] }),
+    )
+
+    const changed = await renameAgentReferences(configDir, [{ from: "reviewer-old", to: "reviewer-new" }])
+
+    expect(changed).toHaveLength(2)
+    for (const id of ["one", "two"]) {
+      const graph = await readGraph(configDir, id)
+      const node = graph?.nodes[0]
+      expect(node?.kind).toBe("agent")
+      if (node?.kind === "agent") expect(node.source.agentName).toBe("reviewer-new")
+    }
+  })
+
+  it("renames an orchestration graph with its published agent", async () => {
+    const entry = createAgentNode("entry", "old-plan", { x: 0, y: 0 })
+    entry.overrides.displayName = "Old Plan"
+    await writeGraph(configDir, seed("Old Plan", { id: "plan", nodes: [entry] }))
+
+    await renameAgentReferences(configDir, [{ from: "old-plan", to: "new-plan", graphId: "plan" }])
+
+    const graph = await readGraph(configDir, "plan")
+    expect(graph?.name).toBe("new-plan")
+    const node = graph?.nodes[0]
+    if (node?.kind === "agent") {
+      expect(node.source.agentName).toBe("new-plan")
+      expect(node.overrides.displayName).toBe("new-plan")
+    }
   })
 
   it("preserves a stored graph id when its editor name changes", async () => {

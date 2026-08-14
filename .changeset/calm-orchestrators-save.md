@@ -3,4 +3,4 @@
 "@kilocode/cli": patch
 ---
 
-Save orchestration plans as custom orchestrators and add their virtual entry node automatically.
+Support visual orchestration plans with published orchestrators, interactive checkpoints, and synchronized agent changes.

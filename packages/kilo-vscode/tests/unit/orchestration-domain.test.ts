@@ -10,6 +10,7 @@ import {
   nodeLabel,
   isOrchestrationAgent,
   orchestrationAgentName,
+  orchestrationAgentGraphId,
   slugify,
   summarize,
   validateGraph,
@@ -82,6 +83,15 @@ describe("orchestration domain", () => {
       "Legacy Name",
     )
     expect(orchestrationAgentName({ description: "Ordinary agent", options: {} })).toBeUndefined()
+  })
+
+  it("reads the graph id from an orchestration agent", () => {
+    expect(
+      orchestrationAgentGraphId({
+        options: { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } },
+      }),
+    ).toBe("demo")
+    expect(orchestrationAgentGraphId({ options: {} })).toBeUndefined()
   })
 
   it("labels nodes by override display name", () => {

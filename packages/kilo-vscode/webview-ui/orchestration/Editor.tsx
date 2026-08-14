@@ -238,6 +238,23 @@ export const Editor: Component<Props> = (props) => {
         }
         showToast({ description: t("orchestration.saved") })
         return
+      case "orchestration.agentsRenamed":
+        setGraph(
+          produce((g) => {
+            for (const rename of message.renames) {
+              const name = g.name
+              if (rename.graphId === g.id) g.name = rename.to
+              for (const node of g.nodes) {
+                if (!isAgentNode(node) || node.source.agentName !== rename.from) continue
+                node.source.agentName = rename.to
+                if (rename.graphId === g.id && node.overrides.displayName === name) {
+                  node.overrides.displayName = rename.to
+                }
+              }
+            }
+          }),
+        )
+        return
       case "orchestration.published":
         setPublishing(false)
         showToast({ icon: "check", description: t("orchestration.published", { name: message.agentName }) })

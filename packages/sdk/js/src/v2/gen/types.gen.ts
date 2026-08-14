@@ -17126,6 +17126,14 @@ export type OrchestrationStartData = {
               id: string
               label: string
             }>
+            display?: {
+              mode: "none" | "predecessors"
+              title?: string
+            }
+            input?: {
+              mode: "none" | "optional" | "required"
+              placeholder?: string
+            }
           }
       >
       edges: Array<{
@@ -17234,6 +17242,14 @@ export type OrchestrationStartResponses = {
               id: string
               label: string
             }>
+            display?: {
+              mode: "none" | "predecessors"
+              title?: string
+            }
+            input?: {
+              mode: "none" | "optional" | "required"
+              placeholder?: string
+            }
           }
       >
       edges: Array<{
@@ -17284,6 +17300,16 @@ export type OrchestrationStartResponses = {
       options: Array<{
         id: string
         label: string
+      }>
+      title?: string
+      displayMode?: "none" | "predecessors"
+      inputMode?: "none" | "optional" | "required"
+      inputPlaceholder?: string
+      context?: Array<{
+        label: string
+        output: string
+        failed?: boolean
+        error?: string
       }>
     }
     createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
@@ -17390,6 +17416,14 @@ export type OrchestrationGetResponses = {
               id: string
               label: string
             }>
+            display?: {
+              mode: "none" | "predecessors"
+              title?: string
+            }
+            input?: {
+              mode: "none" | "optional" | "required"
+              placeholder?: string
+            }
           }
       >
       edges: Array<{
@@ -17440,6 +17474,16 @@ export type OrchestrationGetResponses = {
       options: Array<{
         id: string
         label: string
+      }>
+      title?: string
+      displayMode?: "none" | "predecessors"
+      inputMode?: "none" | "optional" | "required"
+      inputPlaceholder?: string
+      context?: Array<{
+        label: string
+        output: string
+        failed?: boolean
+        error?: string
       }>
     }
     createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
@@ -17546,6 +17590,14 @@ export type OrchestrationCancelResponses = {
               id: string
               label: string
             }>
+            display?: {
+              mode: "none" | "predecessors"
+              title?: string
+            }
+            input?: {
+              mode: "none" | "optional" | "required"
+              placeholder?: string
+            }
           }
       >
       edges: Array<{
@@ -17596,6 +17648,16 @@ export type OrchestrationCancelResponses = {
       options: Array<{
         id: string
         label: string
+      }>
+      title?: string
+      displayMode?: "none" | "predecessors"
+      inputMode?: "none" | "optional" | "required"
+      inputPlaceholder?: string
+      context?: Array<{
+        label: string
+        output: string
+        failed?: boolean
+        error?: string
       }>
     }
     createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"
@@ -17706,6 +17768,14 @@ export type OrchestrationCheckpointResponses = {
               id: string
               label: string
             }>
+            display?: {
+              mode: "none" | "predecessors"
+              title?: string
+            }
+            input?: {
+              mode: "none" | "optional" | "required"
+              placeholder?: string
+            }
           }
       >
       edges: Array<{
@@ -17756,6 +17826,16 @@ export type OrchestrationCheckpointResponses = {
       options: Array<{
         id: string
         label: string
+      }>
+      title?: string
+      displayMode?: "none" | "predecessors"
+      inputMode?: "none" | "optional" | "required"
+      inputPlaceholder?: string
+      context?: Array<{
+        label: string
+        output: string
+        failed?: boolean
+        error?: string
       }>
     }
     createdAt: number | "NaN" | "Infinity" | "-Infinity" | "Infinity" | "-Infinity" | "NaN"

@@ -8,6 +8,7 @@ import { computeDefaultSelection, fetchProviderData } from "../provider-actions"
 import { validateGraph, type OrchestrationGraph } from "./domain"
 import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
 import { buildAgentConfigFromGraph, PublishError, unpublishGraph, upsertPublishedAgent } from "./publish"
+import { onAgentsRenamed } from "./agent-events"
 import type { OrchestrationRequest } from "./messages"
 import type { OrchestrationStartData } from "@kilocode/sdk/v2"
 
@@ -112,6 +113,19 @@ export class OrchestrationProvider implements vscode.Disposable {
           })
         },
       ),
+      this.connection.onEventFiltered(
+        (event, directory) =>
+          event.type === "global.config.updated" && (directory === "global" || directory === this.directory()),
+        () => {
+          this.cachedAgents = null
+          void Promise.all([this.fetchAndSendAgents(), this.sendGraphs()])
+        },
+      ),
+      onAgentsRenamed((renames) => {
+        this.post({ type: "orchestration.agentsRenamed", renames })
+        this.cachedAgents = null
+        void Promise.all([this.fetchAndSendAgents(), this.sendGraphs()])
+      }),
     )
     void this.connect()
   }

@@ -2,7 +2,16 @@ import type { KiloClient, OrchestrationStartData } from "@kilocode/sdk/v2"
 import { getErrorMessage } from "../kilo-provider-utils"
 import type { OrchestrationRequest } from "./messages"
 import { validateGraph, type OrchestrationGraph } from "./domain"
-import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
+import {
+  deleteGraph,
+  duplicateGraph,
+  listGraphs,
+  persistGraph,
+  readGraph,
+  renameAgentReferences,
+  renameGraph,
+} from "./graph-storage"
+import type { AgentRename } from "./domain"
 import { buildAgentConfigFromGraph, PublishError, unpublishGraph, upsertPublishedAgent } from "./publish"
 
 type Options = {
@@ -18,6 +27,13 @@ export class OrchestrationBridge {
   runId: string | undefined
 
   constructor(private readonly opts: Options) {}
+
+  async renameAgents(renames: AgentRename[]) {
+    if (renames.length === 0) return
+    await renameAgentReferences(await this.opts.configDir(), renames)
+    this.opts.post({ type: "orchestration.agentsRenamed", renames })
+    await this.graphs()
+  }
 
   async handle(message: OrchestrationRequest): Promise<void> {
     try {

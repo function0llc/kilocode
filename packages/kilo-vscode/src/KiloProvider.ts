@@ -194,6 +194,8 @@ import {
 } from "./kilo-provider/auto-approval-reason-settings"
 import { OrchestrationBridge } from "./orchestration/bridge"
 import type { OrchestrationRequest } from "./orchestration/messages"
+import type { AgentRename } from "./orchestration/domain"
+import { emitAgentsRenamed } from "./orchestration/agent-events"
 
 let maxCost = 0
 
@@ -1403,6 +1405,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
             message.projectUnset,
             message.globalBindingId,
             message.projectBindingId,
+            message.agentRenames,
           )
           break
         case "openSettingsTab":
@@ -3133,6 +3136,7 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
     projectUnset: string[][] = [],
     globalBindingId?: string,
     projectBindingId?: string,
+    agentRenames: AgentRename[] = [],
   ): Promise<void> {
     if (!this.client || this.connectionState !== "connected") {
       this.postMessage({ type: "configUpdateFailed", message: "Not connected to CLI backend" })
@@ -3245,6 +3249,10 @@ export class KiloProvider implements vscode.WebviewViewProvider, TelemetryProper
         settings: this.configSettings(),
         features: configFeatures(snapshot.effective),
       })
+      if (agentRenames.length > 0) {
+        await this.orchestration.renameAgents(agentRenames)
+        emitAgentsRenamed(agentRenames)
+      }
       this.requirements.clear()
       await Promise.all([
         refreshProviders ? this.fetchAndSendProviders() : Promise.resolve(),

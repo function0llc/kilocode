@@ -16655,6 +16655,34 @@
                                       "required": ["id", "label"],
                                       "additionalProperties": false
                                     }
+                                  },
+                                  "display": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "predecessors"]
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
+                                  },
+                                  "input": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "optional", "required"]
+                                      },
+                                      "placeholder": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
                                   }
                                 },
                                 "required": ["id", "kind", "position", "prompt", "options"],
@@ -16990,6 +17018,42 @@
                               }
                             },
                             "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "displayMode": {
+                          "type": "string",
+                          "enum": ["none", "predecessors"]
+                        },
+                        "inputMode": {
+                          "type": "string",
+                          "enum": ["none", "optional", "required"]
+                        },
+                        "inputPlaceholder": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "output": {
+                                "type": "string"
+                              },
+                              "failed": {
+                                "type": "boolean"
+                              },
+                              "error": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["label", "output"],
                             "additionalProperties": false
                           }
                         }
@@ -17512,6 +17576,34 @@
                                     "required": ["id", "label"],
                                     "additionalProperties": false
                                   }
+                                },
+                                "display": {
+                                  "type": "object",
+                                  "properties": {
+                                    "mode": {
+                                      "type": "string",
+                                      "enum": ["none", "predecessors"]
+                                    },
+                                    "title": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["mode"],
+                                  "additionalProperties": false
+                                },
+                                "input": {
+                                  "type": "object",
+                                  "properties": {
+                                    "mode": {
+                                      "type": "string",
+                                      "enum": ["none", "optional", "required"]
+                                    },
+                                    "placeholder": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": ["mode"],
+                                  "additionalProperties": false
                                 }
                               },
                               "required": ["id", "kind", "position", "prompt", "options"],
@@ -18074,6 +18166,34 @@
                                       "required": ["id", "label"],
                                       "additionalProperties": false
                                     }
+                                  },
+                                  "display": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "predecessors"]
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
+                                  },
+                                  "input": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "optional", "required"]
+                                      },
+                                      "placeholder": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
                                   }
                                 },
                                 "required": ["id", "kind", "position", "prompt", "options"],
@@ -18409,6 +18529,42 @@
                               }
                             },
                             "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "displayMode": {
+                          "type": "string",
+                          "enum": ["none", "predecessors"]
+                        },
+                        "inputMode": {
+                          "type": "string",
+                          "enum": ["none", "optional", "required"]
+                        },
+                        "inputPlaceholder": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "output": {
+                                "type": "string"
+                              },
+                              "failed": {
+                                "type": "boolean"
+                              },
+                              "error": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["label", "output"],
                             "additionalProperties": false
                           }
                         }
@@ -18988,6 +19144,34 @@
                                       "required": ["id", "label"],
                                       "additionalProperties": false
                                     }
+                                  },
+                                  "display": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "predecessors"]
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
+                                  },
+                                  "input": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "optional", "required"]
+                                      },
+                                      "placeholder": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
                                   }
                                 },
                                 "required": ["id", "kind", "position", "prompt", "options"],
@@ -19323,6 +19507,42 @@
                               }
                             },
                             "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "displayMode": {
+                          "type": "string",
+                          "enum": ["none", "predecessors"]
+                        },
+                        "inputMode": {
+                          "type": "string",
+                          "enum": ["none", "optional", "required"]
+                        },
+                        "inputPlaceholder": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "output": {
+                                "type": "string"
+                              },
+                              "failed": {
+                                "type": "boolean"
+                              },
+                              "error": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["label", "output"],
                             "additionalProperties": false
                           }
                         }
@@ -19902,6 +20122,34 @@
                                       "required": ["id", "label"],
                                       "additionalProperties": false
                                     }
+                                  },
+                                  "display": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "predecessors"]
+                                      },
+                                      "title": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
+                                  },
+                                  "input": {
+                                    "type": "object",
+                                    "properties": {
+                                      "mode": {
+                                        "type": "string",
+                                        "enum": ["none", "optional", "required"]
+                                      },
+                                      "placeholder": {
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": ["mode"],
+                                    "additionalProperties": false
                                   }
                                 },
                                 "required": ["id", "kind", "position", "prompt", "options"],
@@ -20237,6 +20485,42 @@
                               }
                             },
                             "required": ["id", "label"],
+                            "additionalProperties": false
+                          }
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "displayMode": {
+                          "type": "string",
+                          "enum": ["none", "predecessors"]
+                        },
+                        "inputMode": {
+                          "type": "string",
+                          "enum": ["none", "optional", "required"]
+                        },
+                        "inputPlaceholder": {
+                          "type": "string"
+                        },
+                        "context": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "label": {
+                                "type": "string"
+                              },
+                              "output": {
+                                "type": "string"
+                              },
+                              "failed": {
+                                "type": "boolean"
+                              },
+                              "error": {
+                                "type": "string"
+                              }
+                            },
+                            "required": ["label", "output"],
                             "additionalProperties": false
                           }
                         }

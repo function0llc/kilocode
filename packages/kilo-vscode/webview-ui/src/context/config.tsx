@@ -27,6 +27,7 @@ import {
   resolveConfig,
 } from "../utils/config-utils"
 import { splitConfigByScope } from "../utils/config-scope"
+import type { AgentRename } from "../../../src/orchestration/domain"
 
 function has(value: Record<string, unknown>) {
   return Object.keys(value).length > 0
@@ -52,6 +53,7 @@ interface ConfigContextValue {
   updateConfig: (partial: Partial<Config>) => void
   updateGlobalConfig: (partial: Partial<Config>) => void
   updateProjectConfig: (partial: Partial<Config>) => void
+  renameAgent: (from: string, to: string, graphId?: string) => void
   updateSetting: (key: string, value: unknown) => void
   applySetting: (key: string, value: unknown, writeKey?: string) => void
   saveConfig: () => void
@@ -94,6 +96,7 @@ export const ConfigProvider: ParentComponent = (props) => {
   const [globalDraft, setGlobalDraft] = createSignal<Partial<Config>>({})
   const [projectDraft, setProjectDraft] = createSignal<Partial<Config>>({})
   const [settingsDraft, setSettingsDraft] = createSignal<Record<string, unknown>>({})
+  const [renames, setRenames] = createSignal<AgentRename[]>([])
   const [bindings, setBindings] = createSignal<{ global?: SettingsConfigBinding; project?: SettingsConfigBinding }>({})
   const isDirty = createMemo(
     () =>
@@ -159,6 +162,7 @@ export const ConfigProvider: ParentComponent = (props) => {
         setDraft({})
         setGlobalDraft({})
         setProjectDraft({})
+        setRenames([])
         setSaveError(null)
         setConfig(message.config)
         if (message.globalConfig !== undefined) {
@@ -317,6 +321,27 @@ export const ConfigProvider: ParentComponent = (props) => {
     setSaveError(null)
   }
 
+  function renameAgent(from: string, to: string, graphId?: string) {
+    const agents = config().agent ?? {}
+    const current = agents[from]
+    if (!current || from === to) return
+    const renamed = graphId
+      ? { ...current, displayName: to, description: `Deterministic orchestration "${to}"` }
+      : current
+    updateConfig({
+      agent: { ...agents, [from]: null, [to]: renamed },
+      ...(config().default_agent === from ? { default_agent: to } : {}),
+    } as Partial<Config>)
+    setRenames((items) => {
+      const prior = items.find((item) => item.to === from)
+      const origin = prior?.from ?? from
+      return [
+        ...items.filter((item) => item !== prior && item.from !== from),
+        { from: origin, to, ...((graphId ?? prior?.graphId) ? { graphId: graphId ?? prior?.graphId } : {}) },
+      ]
+    })
+  }
+
   function updateSetting(key: string, value: unknown) {
     setSettings((prev) => ({ ...prev, [key]: value }))
     setSettingsDraft((prev) => ({ ...prev, [key]: value }))
@@ -381,6 +406,7 @@ export const ConfigProvider: ParentComponent = (props) => {
       projectUnset: configUnsetPaths(project),
       globalBindingId: bindings().global?.id,
       projectBindingId: bindings().project?.id,
+      agentRenames: renames(),
     })
   }
 
@@ -393,6 +419,7 @@ export const ConfigProvider: ParentComponent = (props) => {
     setProjectDraft({})
     setSettings(savedSettings())
     setSettingsDraft({})
+    setRenames([])
     setSaveError(null)
   }
 
@@ -411,6 +438,7 @@ export const ConfigProvider: ParentComponent = (props) => {
     updateConfig,
     updateGlobalConfig,
     updateProjectConfig,
+    renameAgent,
     updateSetting,
     applySetting,
     saveConfig,

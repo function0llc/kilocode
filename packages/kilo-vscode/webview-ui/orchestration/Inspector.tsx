@@ -195,7 +195,10 @@ const SourceSection: Component<{ node: Accessor<AgentNode>; agentInfo: Accessor<
     <>
       <div class="orch-inspector-section">
         <div class="orch-inspector-label">{t("orchestration.inspector.agent")}</div>
-        <div class="orch-inspector-value">{props.node().source.agentName}</div>
+        <div class="orch-inspector-value">{props.agentInfo()?.displayName ?? props.node().source.agentName}</div>
+        <Show when={props.agentInfo()?.displayName}>
+          <div class="orch-inspector-desc">{props.node().source.agentName}</div>
+        </Show>
         <Show when={props.agentInfo()?.description}>
           <div class="orch-inspector-desc">{props.agentInfo()?.description}</div>
         </Show>

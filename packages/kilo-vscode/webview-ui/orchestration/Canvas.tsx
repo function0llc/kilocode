@@ -506,7 +506,10 @@ export const Canvas: Component<Props> = (props) => {
             const entry = () => props.graph.entryNodeId === node.id
             const output = () => props.graph.outputNodeId === node.id
             const selected = () => props.selected()?.kind === "node" && props.selected()?.id === node.id
-            const name = () => nodeLabel(node)
+            const name = () => {
+              if (!isAgentNode(node)) return nodeLabel(node)
+              return node.overrides.displayName || info(node)?.displayName || node.source.agentName
+            }
             const isAgent = () => isAgentNode(node)
             const kindText = () => {
               if (!isAgentNode(node)) return "checkpoint"

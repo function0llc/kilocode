@@ -8504,6 +8504,14 @@ export class Orchestration extends HeyApiClient {
                 id: string
                 label: string
               }>
+              display?: {
+                mode: "none" | "predecessors"
+                title?: string
+              }
+              input?: {
+                mode: "none" | "optional" | "required"
+                placeholder?: string
+              }
             }
         >
         edges: Array<{

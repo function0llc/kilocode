@@ -8,6 +8,7 @@ import type { Config } from "./config"
 import type { ModelAllocation, ReviewComment, TerminalDestination, TerminalPlacement } from "./agent-manager"
 import type { ReviewMessageData } from "../../../../src/shared/review-comments"
 import type { WorkStyle, WorkStyleState } from "../../../../src/shared/work-style-presets"
+import type { AgentRename } from "../../../../src/orchestration/domain"
 import type { AnacondaDesktopWebviewMessage } from "../../../../src/shared/anaconda-desktop-messages"
 import type {
   ClearLegacyDataMessage,
@@ -546,6 +547,7 @@ export interface UpdateConfigMessage {
   projectUnset?: string[][]
   globalBindingId?: string
   projectBindingId?: string
+  agentRenames?: AgentRename[]
 }
 
 export interface RequestNotificationSettingsMessage {

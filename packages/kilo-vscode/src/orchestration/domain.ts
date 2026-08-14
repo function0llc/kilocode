@@ -77,13 +77,6 @@ export type CheckpointInput = {
   placeholder?: string
 }
 
-export type CheckpointContextItem = {
-  label: string
-  output: string
-  failed?: boolean
-  error?: string
-}
-
 export type CheckpointNode = {
   id: string
   kind: "checkpoint"
@@ -122,6 +115,8 @@ export type GraphSummary = {
   nodes: number
 }
 
+export type AgentRename = { from: string; to: string; graphId?: string }
+
 export type OrchestrationAgentLike = {
   displayName?: string
   description?: string
@@ -152,6 +147,13 @@ export function orchestrationAgentName(agent: OrchestrationAgentLike): string | 
   if (!isOrchestrationAgent(agent)) return undefined
   if (agent.displayName) return agent.displayName
   return agent.description?.match(/^Deterministic orchestration "(.+)"$/)?.[1]
+}
+
+export function orchestrationAgentGraphId(agent: OrchestrationAgentLike | null | undefined): string | undefined {
+  if (!isOrchestrationAgent(agent)) return undefined
+  const binding = agent!.options!.kiloOrchestration as Record<string, unknown>
+  const graph = binding.graph as Record<string, unknown>
+  return graph.id as string
 }
 
 /** Structured validation issue so the canvas and inspector can highlight the source. */

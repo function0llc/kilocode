@@ -17,16 +17,19 @@ import { modelPatch } from "./mode-model"
 import PermissionEditor from "./PermissionEditor"
 import { ModelSelectorBase } from "../shared/ModelSelector"
 import { ThinkingSelectorBase } from "../shared/ThinkingSelector"
+import { orchestrationAgentGraphId } from "../../../../src/orchestration/domain"
 
 interface Props {
   name: string
+  taken: string[]
+  onRename: (name: string) => void
   onBack: () => void
   onRemove: (agent: AgentInfo) => void
 }
 
 const ModeEditView: Component<Props> = (props) => {
   const language = useLanguage()
-  const { config, updateConfig } = useConfig()
+  const { config, renameAgent, updateConfig } = useConfig()
   const provider = useProvider()
   const session = useSession()
 
@@ -36,6 +39,8 @@ const ModeEditView: Component<Props> = (props) => {
   const agent = () => session.allAgents().find((a) => a.name === props.name)
   const native = () => agent()?.native ?? false
   const [expanded, setExpanded] = createSignal(false)
+  const [name, setName] = createSignal(props.name)
+  const [nameError, setNameError] = createSignal("")
 
   const cfg = createMemo<AgentConfig>(() => config().agent?.[props.name] ?? {})
   const model = createMemo(() => parseModelString(cfg().model ?? undefined))
@@ -73,6 +78,21 @@ const ModeEditView: Component<Props> = (props) => {
 
   const updatePermission = (patch: PermissionConfig) => {
     updateConfig({ agent: { [props.name]: { permission: patch } } })
+  }
+
+  const rename = () => {
+    const next = name().trim()
+    if (!/^[a-z][a-z0-9-]*$/.test(next)) {
+      setNameError(language.t("settings.agentBehaviour.createMode.nameInvalid"))
+      return
+    }
+    if (next !== props.name && props.taken.includes(next)) {
+      setNameError(language.t("settings.agentBehaviour.createMode.nameTaken"))
+      return
+    }
+    renameAgent(props.name, next, orchestrationAgentGraphId(agent()))
+    props.onRename(next)
+    setNameError("")
   }
 
   const exportMode = () => {
@@ -141,6 +161,32 @@ const ModeEditView: Component<Props> = (props) => {
 
       {/* Description (full-width, custom modes only) */}
       <Show when={!native()}>
+        <Card data-variant="wide-input" style={{ "margin-bottom": "12px" }}>
+          <SettingsRow
+            title={language.t("settings.agentBehaviour.createMode.name")}
+            description={language.t("settings.agentBehaviour.createMode.name.description")}
+            last
+          >
+            <div style={{ display: "flex", gap: "8px", "align-items": "center" }}>
+              <TextField
+                value={name()}
+                onChange={(value) => {
+                  setName(value)
+                  setNameError("")
+                }}
+              />
+              <Button variant="secondary" disabled={name().trim() === props.name} onClick={rename}>
+                {language.t("common.rename")}
+              </Button>
+            </div>
+            <Show when={nameError()}>
+              <div style={{ color: "var(--vscode-errorForeground)", "font-size": "var(--kilo-font-size-11)" }}>
+                {nameError()}
+              </div>
+            </Show>
+          </SettingsRow>
+        </Card>
+
         <Card style={{ "margin-bottom": "12px" }}>
           <div data-slot="settings-row-label-title" style={{ "margin-bottom": "8px" }}>
             {language.t("settings.agentBehaviour.editMode.description")}

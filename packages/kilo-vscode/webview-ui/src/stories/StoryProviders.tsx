@@ -390,6 +390,7 @@ const ConfigWrapper: ParentComponent<{
         if (!scoped) setCfg(update)
         setDirty(true)
       },
+      renameAgent: () => setDirty(true),
       updateSetting: (key: string, value: unknown) => {
         setSettings((prev) => ({ ...prev, [key]: value }))
         setDirty(true)
