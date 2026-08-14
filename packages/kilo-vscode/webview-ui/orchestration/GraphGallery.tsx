@@ -112,10 +112,14 @@ export const GraphGallery: Component<Props> = (props) => {
                     <Show
                       when={confirming() !== summary.id}
                       fallback={
-                        <Button size="small" variant="secondary" onClick={() => {
-                          setConfirming(null)
-                          vscode.postMessage({ type: "orchestration.deleteGraph", graphId: summary.id })
-                        }}>
+                        <Button
+                          size="small"
+                          variant="secondary"
+                          onClick={() => {
+                            setConfirming(null)
+                            vscode.postMessage({ type: "orchestration.deleteGraph", graphId: summary.id })
+                          }}
+                        >
                           {t("orchestration.gallery.confirmDelete")}
                         </Button>
                       }

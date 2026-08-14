@@ -105,7 +105,11 @@ export class OrchestrationProvider implements vscode.Disposable {
         (event) => {
           if (event.type !== "orchestration.run.updated") return
           this.runId = event.properties.runID
-          this.post({ type: "orchestration.runEvent", runId: event.properties.runID, revision: event.properties.revision })
+          this.post({
+            type: "orchestration.runEvent",
+            runId: event.properties.runID,
+            revision: event.properties.revision,
+          })
         },
       ),
     )
@@ -375,7 +379,10 @@ export class OrchestrationProvider implements vscode.Disposable {
   private async getRun(id: string): Promise<void> {
     try {
       const client = this.connection.getClient()
-      const { data } = await client.orchestration.get({ runID: id, directory: this.directory() }, { throwOnError: true })
+      const { data } = await client.orchestration.get(
+        { runID: id, directory: this.directory() },
+        { throwOnError: true },
+      )
       this.runId = data.id
       this.post({ type: "orchestration.run", run: data })
     } catch (err) {
@@ -386,14 +393,19 @@ export class OrchestrationProvider implements vscode.Disposable {
   private async cancelRun(id: string): Promise<void> {
     try {
       const client = this.connection.getClient()
-      const { data } = await client.orchestration.cancel({ runID: id, directory: this.directory() }, { throwOnError: true })
+      const { data } = await client.orchestration.cancel(
+        { runID: id, directory: this.directory() },
+        { throwOnError: true },
+      )
       this.post({ type: "orchestration.run", run: data })
     } catch (err) {
       this.fail("cancelRun", err)
     }
   }
 
-  private async checkpoint(msg: Extract<OrchestrationRequest, { type: "orchestration.resolveCheckpoint" }>): Promise<void> {
+  private async checkpoint(
+    msg: Extract<OrchestrationRequest, { type: "orchestration.resolveCheckpoint" }>,
+  ): Promise<void> {
     try {
       const client = this.connection.getClient()
       const { data } = await client.orchestration.checkpoint(

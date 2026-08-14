@@ -98,38 +98,37 @@ export class OrchestrationBridge {
     const issues = validateGraph(graph, await this.opts.agents())
     if (issues.length) return this.fail("publishAsAgent", issues.map((issue) => issue.message).join("; "))
     const result = buildAgentConfigFromGraph(graph)
-    await this.opts.client().config.overlayUpdate(
-      { scope: "global", set: { agent: { [result.slug]: result.config } }, directory: this.opts.directory() },
-      { throwOnError: true },
-    )
+    await this.opts
+      .client()
+      .config.overlayUpdate(
+        { scope: "global", set: { agent: { [result.slug]: result.config } }, directory: this.opts.directory() },
+        { throwOnError: true },
+      )
     this.opts.post({ type: "orchestration.published", agentName: graph.name, slug: result.slug })
     await this.opts.refreshAgents?.()
   }
 
   private async start(graph: OrchestrationGraph, input: string) {
     const body = graph as unknown as NonNullable<OrchestrationStartData["body"]>["graph"]
-    const { data } = await this.opts.client().orchestration.start(
-      { graph: body, input, directory: this.opts.directory() },
-      { throwOnError: true },
-    )
+    const { data } = await this.opts
+      .client()
+      .orchestration.start({ graph: body, input, directory: this.opts.directory() }, { throwOnError: true })
     this.runId = data.id
     this.opts.post({ type: "orchestration.run", run: data })
   }
 
   private async get(id: string) {
-    const { data } = await this.opts.client().orchestration.get(
-      { runID: id, directory: this.opts.directory() },
-      { throwOnError: true },
-    )
+    const { data } = await this.opts
+      .client()
+      .orchestration.get({ runID: id, directory: this.opts.directory() }, { throwOnError: true })
     this.runId = data.id
     this.opts.post({ type: "orchestration.run", run: data })
   }
 
   private async cancel(id: string) {
-    const { data } = await this.opts.client().orchestration.cancel(
-      { runID: id, directory: this.opts.directory() },
-      { throwOnError: true },
-    )
+    const { data } = await this.opts
+      .client()
+      .orchestration.cancel({ runID: id, directory: this.opts.directory() }, { throwOnError: true })
     this.opts.post({ type: "orchestration.run", run: data })
   }
 

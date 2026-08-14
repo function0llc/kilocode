@@ -3,7 +3,15 @@
 // requestMcpStatus/mcpStatusLoaded) so no new request types were invented for
 // palette data, plus the orchestration.* responses for graphs.
 
-import { createContext, createSignal, onCleanup, onMount, useContext, type Accessor, type ParentComponent } from "solid-js"
+import {
+  createContext,
+  createSignal,
+  onCleanup,
+  onMount,
+  useContext,
+  type Accessor,
+  type ParentComponent,
+} from "solid-js"
 import { useVSCode } from "../src/context/vscode"
 import type { AgentInfo, ConnectionState, ExtensionMessage, McpStatusEntry, SkillInfo } from "../src/types/messages"
 import type { GraphSummary } from "../src/types/messages/orchestration"

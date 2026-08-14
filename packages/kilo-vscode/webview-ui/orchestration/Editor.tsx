@@ -3,7 +3,13 @@ import { createStore, produce, reconcile, unwrap } from "solid-js/store"
 import { showToast } from "@kilocode/kilo-ui/toast"
 import { Button } from "@kilocode/kilo-ui/button"
 import { TextField } from "@kilocode/kilo-ui/text-field"
-import { createAgentNode, createCheckpointNode, createId, isAgentNode, validateGraph } from "../../src/orchestration/domain"
+import {
+  createAgentNode,
+  createCheckpointNode,
+  createId,
+  isAgentNode,
+  validateGraph,
+} from "../../src/orchestration/domain"
 import type { OrchestrationGraph } from "../../src/orchestration/domain"
 import { useVSCode } from "../src/context/vscode"
 import { useOrchestrationData } from "./data"
@@ -48,13 +54,18 @@ export const Editor: Component<Props> = (props) => {
   const knownAgents = createMemo(() => new Set(data.agents().map((agent) => agent.name)))
   // An empty roster means agents have not loaded yet — skip the unknown-agent check.
   const issues = createMemo(() => validateGraph(graph, knownAgents().size > 0 ? knownAgents() : undefined))
-  const issueMessages = createMemo(() => issues().map((issue) => issue.message).join("; "))
-  const canPublish = createMemo(() => graph.nodes.length > 0 && !!graph.entryNodeId && issues().length === 0)
+  const issueMessages = createMemo(() =>
+    issues()
+      .map((issue) => issue.message)
+      .join("; "),
+  )
+  const canPublish = createMemo(
+    () => !!graph.name.trim() && graph.nodes.length > 0 && !!graph.entryNodeId && issues().length === 0,
+  )
   const canSetEntry = createMemo(() => selected()?.kind === "node")
   const running = createMemo(() => run()?.status === "running" || run()?.status === "waiting-for-user")
 
-  const persist = (id = run()?.id) =>
-    vscode.setState({ runId: id, input: input(), inspectorWidth: inspectorWidth() })
+  const persist = (id = run()?.id) => vscode.setState({ runId: id, input: input(), inspectorWidth: inspectorWidth() })
 
   const resizeInspector = (event: PointerEvent) => {
     event.preventDefault()
@@ -97,7 +108,10 @@ export const Editor: Component<Props> = (props) => {
   }
 
   const save = () => {
-    if (saving()) return
+    if (saving() || !graph.name.trim()) return
+    if (graph.name !== graph.name.trim()) {
+      setGraph("name", graph.name.trim())
+    }
     setSaving(true)
     vscode.postMessage({ type: "orchestration.saveGraph", graph: unwrap(graph) })
   }
@@ -260,6 +274,11 @@ export const Editor: Component<Props> = (props) => {
         canSetEntry={canSetEntry}
         canPublish={canPublish}
         publishHint={() => issueMessages()}
+        onName={(name) => {
+          if (name === graph.name) return
+          setGraph("name", name)
+          setDirty(true)
+        }}
         onSave={save}
         onSetEntry={() => {
           const sel = selected()
@@ -283,7 +302,15 @@ export const Editor: Component<Props> = (props) => {
       />
       <div class="orch-editor-body">
         <Palette onAddAgent={addAgent} onAddCheckpoint={addCheckpoint} onAttach={attach} />
-        <Canvas graph={graph} run={run} selected={selected} onSelect={setSelected} mutate={mutate} knownAgents={knownAgents} api={api} />
+        <Canvas
+          graph={graph}
+          run={run}
+          selected={selected}
+          onSelect={setSelected}
+          mutate={mutate}
+          knownAgents={knownAgents}
+          api={api}
+        />
         <div class="orch-inspector-shell" style={{ width: `${inspectorWidth()}px` }}>
           <div
             class="orch-inspector-resizer"
@@ -315,11 +342,7 @@ export const Editor: Component<Props> = (props) => {
         {(waiting) => (
           <div class="orch-checkpoint-bar">
             <strong>{waiting().prompt}</strong>
-            <TextField
-              value={feedback()}
-              placeholder={t("orchestration.run.feedback")}
-              onChange={setFeedback}
-            />
+            <TextField value={feedback()} placeholder={t("orchestration.run.feedback")} onChange={setFeedback} />
             <div class="orch-checkpoint-options">
               {waiting().options.map((option) => (
                 <Button

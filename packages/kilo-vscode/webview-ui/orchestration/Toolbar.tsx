@@ -1,6 +1,7 @@
 import { createSignal, Show, type Component } from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
+import { InlineInput } from "@kilocode/kilo-ui/inline-input"
 import { TextField } from "@kilocode/kilo-ui/text-field"
 import type { CanvasApi } from "./types"
 import { useOrchestrationLanguage } from "./language"
@@ -16,6 +17,7 @@ interface Props {
   canSetEntry: () => boolean
   canPublish: () => boolean
   publishHint: () => string
+  onName: (value: string) => void
   onSave: () => void
   onSetEntry: () => void
   onPublish: () => void
@@ -41,14 +43,25 @@ export const Toolbar: Component<Props> = (props) => {
           onClick={props.onBack}
         />
         <div class="orch-toolbar-name">
-          <span class="name">{props.name()}</span>
+          <InlineInput
+            class="name"
+            aria-label={t("orchestration.toolbar.name")}
+            value={props.name()}
+            size={Math.min(Math.max(props.name().length + 2, 14), 48)}
+            onInput={(event) => props.onName(event.currentTarget.value)}
+          />
           <Show when={props.dirty()}>
             <span class="orch-toolbar-dirty">{t("orchestration.toolbar.unsaved")}</span>
           </Show>
         </div>
 
         <div class="orch-toolbar-group">
-          <Button size="small" variant="secondary" onClick={props.onSave} disabled={props.saving()}>
+          <Button
+            size="small"
+            variant="secondary"
+            onClick={props.onSave}
+            disabled={props.saving() || !props.name().trim()}
+          >
             {t("orchestration.toolbar.save")}
           </Button>
           <Button
@@ -73,11 +86,7 @@ export const Toolbar: Component<Props> = (props) => {
         </div>
 
         <div class="orch-toolbar-run">
-          <TextField
-            value={props.input()}
-            placeholder={t("orchestration.run.input")}
-            onChange={props.onInput}
-          />
+          <TextField value={props.input()} placeholder={t("orchestration.run.input")} onChange={props.onInput} />
           <Button
             size="small"
             variant="primary"

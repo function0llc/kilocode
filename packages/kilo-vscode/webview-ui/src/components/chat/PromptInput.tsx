@@ -3,7 +3,18 @@
  * Text input with send/abort buttons, ghost-text autocomplete, and @ file mention support
  */
 
-import { createSignal, createEffect, createMemo, on, For, Index, onCleanup, Show, untrack, type Component } from "solid-js"
+import {
+  createSignal,
+  createEffect,
+  createMemo,
+  on,
+  For,
+  Index,
+  onCleanup,
+  Show,
+  untrack,
+  type Component,
+} from "solid-js"
 import { Button } from "@kilocode/kilo-ui/button"
 import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Tooltip } from "@kilocode/kilo-ui/tooltip"
@@ -1510,11 +1521,7 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
               {language.t("settings.agentBehaviour.subtab.orchestration")}
             </Button>
           </Show>
-          <Show
-            when={
-              !orchestration() && session.hasModelOverride(sid())
-            }
-          >
+          <Show when={!orchestration() && session.hasModelOverride(sid())}>
             <Tooltip value={language.t("prompt.action.resetModel")} placement="top" openDelay={0}>
               <Button
                 variant="ghost"

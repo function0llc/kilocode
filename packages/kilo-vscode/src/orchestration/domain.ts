@@ -172,11 +172,7 @@ export function createGraph(name: string): OrchestrationGraph {
   }
 }
 
-export function createAgentNode(
-  id: string,
-  agentName: string,
-  position: { x: number; y: number },
-): AgentNode {
+export function createAgentNode(id: string, agentName: string, position: { x: number; y: number }): AgentNode {
   return {
     id,
     kind: "agent",
@@ -424,12 +420,8 @@ export function coerceGraph(value: unknown): OrchestrationGraph | null {
     version: 2,
     entryNodeId: typeof raw.entryNodeId === "string" ? raw.entryNodeId : null,
     outputNodeId: typeof raw.outputNodeId === "string" ? raw.outputNodeId : null,
-    nodes: raw.nodes
-      .map(coerceNode)
-      .filter((node): node is OrchestrationNode => node !== null),
-    edges: raw.edges
-      .map(coerceEdge)
-      .filter((edge): edge is OrchestrationEdge => edge !== null),
+    nodes: raw.nodes.map(coerceNode).filter((node): node is OrchestrationNode => node !== null),
+    edges: raw.edges.map(coerceEdge).filter((edge): edge is OrchestrationEdge => edge !== null),
     updatedAt: typeof raw.updatedAt === "string" ? raw.updatedAt : new Date(0).toISOString(),
   }
 }
@@ -484,7 +476,11 @@ function validateEdge(
       edgeId: edge.id,
     })
   }
-  if (fromCheckpoint && edge.route.outcome && !fromCheckpoint.options.some((option) => option.id === edge.route.outcome)) {
+  if (
+    fromCheckpoint &&
+    edge.route.outcome &&
+    !fromCheckpoint.options.some((option) => option.id === edge.route.outcome)
+  ) {
     issues.push({
       code: "checkpoint-outcome-unknown",
       message: `The outcome "${edge.route.outcome}" is not one of the checkpoint's options`,
@@ -591,7 +587,9 @@ export function validateGraph(graph: OrchestrationGraph, knownAgents?: Iterable<
   findUnreachable(issues, graph, ids)
 
   // Multiple terminal nodes need an explicit output selection.
-  const terminal = graph.nodes.filter((node) => !graph.edges.some((edge) => edge.from === node.id && edge.route.type === "forward"))
+  const terminal = graph.nodes.filter(
+    (node) => !graph.edges.some((edge) => edge.from === node.id && edge.route.type === "forward"),
+  )
   if (terminal.length > 1 && !graph.outputNodeId) {
     issues.push({
       code: "output-required",

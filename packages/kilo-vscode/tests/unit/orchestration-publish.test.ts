@@ -31,9 +31,7 @@ describe("orchestration publish", () => {
 
   it("supports checkpoint graphs", () => {
     expect(() =>
-      buildAgentConfigFromGraph(
-        graph({ entryNodeId: "cp", nodes: [createCheckpointNode("cp", { x: 0, y: 0 })] }),
-      ),
+      buildAgentConfigFromGraph(graph({ entryNodeId: "cp", nodes: [createCheckpointNode("cp", { x: 0, y: 0 })] })),
     ).not.toThrow()
   })
 

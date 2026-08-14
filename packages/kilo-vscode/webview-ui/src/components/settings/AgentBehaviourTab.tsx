@@ -1121,10 +1121,7 @@ const AgentBehaviourTab: Component = () => {
   }
 
   return (
-    <div
-      class="agent-behaviour"
-      classList={{ "orchestration-active": activeSubtab() === "orchestration" }}
-    >
+    <div class="agent-behaviour" classList={{ "orchestration-active": activeSubtab() === "orchestration" }}>
       {/* Horizontal subtab bar */}
       <div
         class="agent-behaviour-subtabs"

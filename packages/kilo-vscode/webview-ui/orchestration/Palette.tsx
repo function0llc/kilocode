@@ -109,7 +109,7 @@ export const Palette: Component<Props> = (props) => {
               </div>
             )}
           </For>
-        </Show>
+        </Show>,
       )}
 
       {section(
@@ -132,7 +132,7 @@ export const Palette: Component<Props> = (props) => {
               </div>
             )}
           </For>
-        </Show>
+        </Show>,
       )}
 
       {section(
@@ -155,7 +155,7 @@ export const Palette: Component<Props> = (props) => {
               </div>
             )}
           </For>
-        </Show>
+        </Show>,
       )}
 
       {section(
@@ -177,7 +177,7 @@ export const Palette: Component<Props> = (props) => {
               </div>
             )}
           </For>
-        </Show>
+        </Show>,
       )}
       <Show when={ghost()}>
         {(current) => (
@@ -187,7 +187,15 @@ export const Palette: Component<Props> = (props) => {
             style={{ left: `${current().clientX}px`, top: `${current().clientY}px` }}
           >
             <Icon
-              name={current().item.kind === "subagent" ? "subagent" : current().item.kind === "mcp" ? "mcp" : current().item.kind === "skill" ? "star" : "brain"}
+              name={
+                current().item.kind === "subagent"
+                  ? "subagent"
+                  : current().item.kind === "mcp"
+                    ? "mcp"
+                    : current().item.kind === "skill"
+                      ? "star"
+                      : "brain"
+              }
               size="small"
             />
             <span>{current().item.name}</span>

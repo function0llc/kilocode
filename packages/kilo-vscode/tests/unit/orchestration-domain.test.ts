@@ -94,10 +94,7 @@ describe("orchestration domain", () => {
       graph({
         entryNodeId: "a",
         nodes: [node("a", "code"), node("b", "review")],
-        edges: [
-          { ...createEdge("e1", "b", "b") },
-          { ...createEdge("e2", "a", "gone") },
-        ],
+        edges: [{ ...createEdge("e1", "b", "b") }, { ...createEdge("e2", "a", "gone") }],
       }),
     )
     expect(codes(issues)).toContain("self-loop")
@@ -122,10 +119,7 @@ describe("orchestration domain", () => {
       graph({
         entryNodeId: "a",
         nodes: [node("a", "code"), node("b", "review")],
-        edges: [
-          { ...createEdge("e0", "a", "b") },
-          edge,
-        ],
+        edges: [{ ...createEdge("e0", "a", "b") }, edge],
       }),
     )
     expect(issues).toEqual([])
@@ -138,10 +132,7 @@ describe("orchestration domain", () => {
       graph({
         entryNodeId: "a",
         nodes: [node("a", "code"), node("b", "review")],
-        edges: [
-          { ...createEdge("e0", "a", "b") },
-          edge,
-        ],
+        edges: [{ ...createEdge("e0", "a", "b") }, edge],
       }),
     )
     expect(codes(issues)).toContain("loop-limit-missing")
@@ -152,10 +143,7 @@ describe("orchestration domain", () => {
       graph({
         entryNodeId: "a",
         nodes: [node("a", "code"), node("b", "review")],
-        edges: [
-          { ...createEdge("e1", "a", "b") },
-          { ...createEdge("e2", "b", "a") },
-        ],
+        edges: [{ ...createEdge("e1", "a", "b") }, { ...createEdge("e2", "b", "a") }],
       }),
     )
     const cycle = issues.find((issue) => issue.code === "forward-cycle")
@@ -198,10 +186,7 @@ describe("orchestration domain", () => {
       graph({
         entryNodeId: "a",
         nodes: [node("a", "code"), node("b", "review"), node("c", "docs")],
-        edges: [
-          { ...createEdge("e1", "a", "b") },
-          { ...createEdge("e2", "a", "c") },
-        ],
+        edges: [{ ...createEdge("e1", "a", "b") }, { ...createEdge("e2", "a", "c") }],
       }),
     )
     expect(codes(issues)).toContain("output-required")
@@ -328,8 +313,20 @@ describe("orchestration domain", () => {
       name: "Legacy",
       entryNodeId: "n1",
       nodes: [
-        { id: "n1", kind: "subagent", agentName: "plan", position: { x: 1, y: 2 }, capabilities: { skills: ["chart"], mcpServers: [] } },
-        { id: "n2", kind: "agent", agentName: "code", position: { x: 3, y: 4 }, capabilities: { skills: [], mcpServers: ["github"] } },
+        {
+          id: "n1",
+          kind: "subagent",
+          agentName: "plan",
+          position: { x: 1, y: 2 },
+          capabilities: { skills: ["chart"], mcpServers: [] },
+        },
+        {
+          id: "n2",
+          kind: "agent",
+          agentName: "code",
+          position: { x: 3, y: 4 },
+          capabilities: { skills: [], mcpServers: ["github"] },
+        },
       ],
       edges: [{ id: "e1", from: "n1", to: "n2", meta: { junk: true } }],
       updatedAt: "2026-01-01T00:00:00.000Z",
@@ -353,7 +350,15 @@ describe("orchestration domain", () => {
       entryNodeId: "a",
       outputNodeId: "b",
       nodes: [
-        { id: "a", kind: "agent", source: { agentName: "code" }, position: { x: 0, y: 0 }, overrides: { model: { providerID: "kilo", modelID: "auto" }, prompt: { mode: "append", text: "hi" } }, capabilities: {}, runtime: { retries: 3, failure: "continue" } },
+        {
+          id: "a",
+          kind: "agent",
+          source: { agentName: "code" },
+          position: { x: 0, y: 0 },
+          overrides: { model: { providerID: "kilo", modelID: "auto" }, prompt: { mode: "append", text: "hi" } },
+          capabilities: {},
+          runtime: { retries: 3, failure: "continue" },
+        },
         { id: "cp", kind: "checkpoint", position: { x: 0, y: 0 }, prompt: "OK?", options: [{ id: "y", label: "Yes" }] },
       ],
       edges: [
@@ -392,13 +397,21 @@ describe("orchestration domain", () => {
           from: "a",
           to: "b",
           route: { type: "forward" },
-          meta: { controls: [{ x: 12, y: 34 }, { x: 56, y: 78 }] },
+          meta: {
+            controls: [
+              { x: 12, y: 34 },
+              { x: 56, y: 78 },
+            ],
+          },
         },
       ],
       updatedAt: "2026-01-01T00:00:00.000Z",
     })
 
-    expect(result?.edges[0].meta?.controls).toEqual([{ x: 12, y: 34 }, { x: 56, y: 78 }])
+    expect(result?.edges[0].meta?.controls).toEqual([
+      { x: 12, y: 34 },
+      { x: 56, y: 78 },
+    ])
   })
 
   it("rejects non-graph values", () => {

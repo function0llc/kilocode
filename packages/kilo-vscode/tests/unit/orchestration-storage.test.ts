@@ -134,8 +134,20 @@ describe("orchestration graph storage", () => {
       name: "Legacy",
       entryNodeId: "a",
       nodes: [
-        { id: "a", kind: "agent", agentName: "code", position: { x: 0, y: 0 }, capabilities: { skills: [], mcpServers: [] } },
-        { id: "b", kind: "subagent", agentName: "review", position: { x: 0, y: 0 }, capabilities: { skills: [], mcpServers: [] } },
+        {
+          id: "a",
+          kind: "agent",
+          agentName: "code",
+          position: { x: 0, y: 0 },
+          capabilities: { skills: [], mcpServers: [] },
+        },
+        {
+          id: "b",
+          kind: "subagent",
+          agentName: "review",
+          position: { x: 0, y: 0 },
+          capabilities: { skills: [], mcpServers: [] },
+        },
       ],
       edges: [{ id: "e1", from: "a", to: "b" }],
       updatedAt: "2026-01-01T00:00:00.000Z",

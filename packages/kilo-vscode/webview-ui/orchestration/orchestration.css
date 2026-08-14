@@ -217,6 +217,7 @@
 }
 
 .orch-toolbar-name .name {
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -534,7 +535,8 @@
 .orch-node.running,
 .orch-node.waiting {
   border-color: var(--vscode-progressBar-background, var(--vscode-focusBorder));
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--vscode-progressBar-background, var(--vscode-focusBorder)) 25%, transparent);
+  box-shadow: 0 0 0 2px
+    color-mix(in srgb, var(--vscode-progressBar-background, var(--vscode-focusBorder)) 25%, transparent);
 }
 
 .orch-node.completed {

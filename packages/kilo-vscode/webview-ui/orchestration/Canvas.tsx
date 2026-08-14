@@ -53,7 +53,10 @@ function edgePoints(from: { x: number; y: number }, to: { x: number; y: number }
   const tx = to.x + NODE_WIDTH / 2
   const ty = to.y
   const d = Math.max(36, Math.min(140, Math.abs(ty - sy) / 2 + 30))
-  return [{ x: sx, y: sy + d }, { x: tx, y: ty - d }] as const
+  return [
+    { x: sx, y: sy + d },
+    { x: tx, y: ty - d },
+  ] as const
 }
 
 function controlledPath(
@@ -466,7 +469,12 @@ export const Canvas: Component<Props> = (props) => {
                     )}
                   </Show>
                   <Show when={props.selected()?.kind === "edge" && props.selected()?.id === edge.id}>
-                    <For each={edge.meta?.controls ?? (source() && target() ? edgePoints(source()!.position, target()!.position) : [])}>
+                    <For
+                      each={
+                        edge.meta?.controls ??
+                        (source() && target() ? edgePoints(source()!.position, target()!.position) : [])
+                      }
+                    >
                       {(point, index) => (
                         <g
                           class="orch-edge-control"
@@ -507,13 +515,13 @@ export const Canvas: Component<Props> = (props) => {
                   entry: entry(),
                   output: output(),
                   checkpoint: !isAgent(),
-                   unresolved: unresolved(node),
-                   queued: nodeRun(node.id)?.status === "queued",
-                   running: nodeRun(node.id)?.status === "running",
-                   completed: nodeRun(node.id)?.status === "completed",
-                   failed: nodeRun(node.id)?.status === "failed",
-                   cancelled: nodeRun(node.id)?.status === "cancelled",
-                   waiting: props.run()?.waiting?.nodeId === node.id,
+                  unresolved: unresolved(node),
+                  queued: nodeRun(node.id)?.status === "queued",
+                  running: nodeRun(node.id)?.status === "running",
+                  completed: nodeRun(node.id)?.status === "completed",
+                  failed: nodeRun(node.id)?.status === "failed",
+                  cancelled: nodeRun(node.id)?.status === "cancelled",
+                  waiting: props.run()?.waiting?.nodeId === node.id,
                 }}
                 style={{
                   left: `${node.position.x}px`,

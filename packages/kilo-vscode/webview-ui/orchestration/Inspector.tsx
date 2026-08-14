@@ -4,13 +4,7 @@ import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { ModelSelectorBase } from "../src/components/shared/ModelSelector"
 import { useProvider } from "../src/context/provider"
-import {
-  createId,
-  isAgentNode,
-  isCheckpointNode,
-  nodeById,
-  nodeLabel,
-} from "../../src/orchestration/domain"
+import { createId, isAgentNode, isCheckpointNode, nodeById, nodeLabel } from "../../src/orchestration/domain"
 import type {
   AgentNode,
   CheckpointNode,
@@ -77,17 +71,11 @@ export const Inspector: Component<Props> = (props) => {
         <div class="orch-inspector-empty">{t("orchestration.inspector.selectNode")}</div>
       </Show>
 
-      <Show when={agentNode()}>
-        {(node) => <AgentInspector node={node} {...props} />}
-      </Show>
+      <Show when={agentNode()}>{(node) => <AgentInspector node={node} {...props} />}</Show>
 
-      <Show when={checkpointNode()}>
-        {(node) => <CheckpointInspector node={node} {...props} />}
-      </Show>
+      <Show when={checkpointNode()}>{(node) => <CheckpointInspector node={node} {...props} />}</Show>
 
-      <Show when={selectedEdge()}>
-        {(edge) => <EdgeInspector edge={edge} {...props} />}
-      </Show>
+      <Show when={selectedEdge()}>{(edge) => <EdgeInspector edge={edge} {...props} />}</Show>
     </aside>
   )
 }
@@ -171,7 +159,10 @@ type OverrideActions = {
   setRuntime: (key: "timeoutMs" | "retries" | "failure" | "includeInFinalOutput", value: unknown) => void
 }
 
-function useOverrideActions(node: Accessor<AgentNode>, mutate: (fn: (graph: OrchestrationGraph) => void) => void): OverrideActions {
+function useOverrideActions(
+  node: Accessor<AgentNode>,
+  mutate: (fn: (graph: OrchestrationGraph) => void) => void,
+): OverrideActions {
   const setOverride = (key: keyof NodeOverrides, value: unknown) => {
     mutate((g) => {
       const target = g.nodes.find((item) => item.id === node().id)
@@ -284,9 +275,7 @@ const ModelSection: Component<{
             }}
           >
             <option value="">{t("orchestration.inspector.inherit")}</option>
-            <For each={props.variantOptions()}>
-              {(variant) => <option value={variant}>{variant}</option>}
-            </For>
+            <For each={props.variantOptions()}>{(variant) => <option value={variant}>{variant}</option>}</For>
           </select>
         </Field>
       </Show>
@@ -317,7 +306,9 @@ const ModelSection: Component<{
           min="0"
           max="1"
           placeholder={
-            props.agentInfo()?.topP !== undefined ? String(props.agentInfo()!.topP) : t("orchestration.inspector.inherit")
+            props.agentInfo()?.topP !== undefined
+              ? String(props.agentInfo()!.topP)
+              : t("orchestration.inspector.inherit")
           }
           value={numberValue(props.node().overrides.topP) ?? ""}
           onInput={(e) => {
@@ -333,7 +324,9 @@ const ModelSection: Component<{
           step="1"
           min="1"
           placeholder={
-            props.agentInfo()?.steps !== undefined ? String(props.agentInfo()!.steps) : t("orchestration.inspector.inherit")
+            props.agentInfo()?.steps !== undefined
+              ? String(props.agentInfo()!.steps)
+              : t("orchestration.inspector.inherit")
           }
           value={numberValue(props.node().overrides.steps) ?? ""}
           onInput={(e) => {
