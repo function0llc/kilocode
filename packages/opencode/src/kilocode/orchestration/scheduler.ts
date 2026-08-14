@@ -23,6 +23,7 @@ import {
   nodeById,
   nodeLabel,
   type AgentNode,
+  type CheckpointContextItem,
   type CheckpointNode,
   type CheckpointOption,
   type OrchestrationEdge,
@@ -85,6 +86,11 @@ export type SchedulerEvent =
       round: number
       prompt: string
       options: CheckpointOption[]
+      title?: string
+      displayMode?: "none" | "predecessors"
+      inputMode?: "none" | "optional" | "required"
+      inputPlaceholder?: string
+      context?: CheckpointContextItem[]
     }
   | { type: "checkpoint-resolved"; nodeId: string; round: number; outcome: string; feedback?: string }
 
@@ -369,7 +375,13 @@ export class OrchestrationScheduler {
     for (const edge of this.graph.edges) {
       if (edge.to !== node.id || edge.route.type !== "forward") continue
       const source = nodeById(this.graph, edge.from)
-      if (!source || isCheckpointNode(source)) continue
+      if (!source) continue
+      if (isCheckpointNode(source)) {
+        const output = this.checkpointOutput(source)
+        if (!output) continue
+        result.push({ nodeId: source.id, label: nodeLabel(source), round: this.round, output })
+        continue
+      }
       const run = this.runInRound(source.id, this.round) ?? latestRun(this.run.nodes[source.id])
       if (!run) continue
       result.push({
@@ -382,6 +394,16 @@ export class OrchestrationScheduler {
     return result
   }
 
+  private checkpointOutput(node: CheckpointNode): string | undefined {
+    const resolutions = this.run.checkpoints[node.id]
+    if (!resolutions || resolutions.length === 0) return undefined
+    const resolution = resolutions.find((r) => r.round === this.round) ?? resolutions[resolutions.length - 1]!
+    const label = node.options.find((o) => o.id === resolution.outcome)?.label ?? resolution.outcome
+    let output = `Checkpoint decision: ${label}`
+    if (resolution.feedback) output += `\nFeedback: ${resolution.feedback}`
+    return output
+  }
+
   // -------------------------------------------------------------------------
   // Pass / round transitions
   // -------------------------------------------------------------------------
@@ -391,13 +413,40 @@ export class OrchestrationScheduler {
     this.waiting = { nodeId: node.id }
     this.run.status = "waiting-for-user"
     this.run.updatedAt = Date.now()
+    const context = node.display?.mode === "predecessors" ? this.checkpointContext(node) : []
     this.emit({
       type: "checkpoint-waiting",
       nodeId: node.id,
       round: this.round,
       prompt: node.prompt,
       options: node.options,
+      ...(node.display?.title ? { title: node.display.title } : {}),
+      ...(node.display ? { displayMode: node.display.mode } : {}),
+      ...(node.input
+        ? {
+            inputMode: node.input.mode,
+            ...(node.input.placeholder ? { inputPlaceholder: node.input.placeholder } : {}),
+          }
+        : {}),
+      ...(context.length > 0 ? { context } : {}),
     })
+  }
+
+  private checkpointContext(node: CheckpointNode): CheckpointContextItem[] {
+    const result: CheckpointContextItem[] = []
+    for (const edge of this.graph.edges) {
+      if (edge.to !== node.id || edge.route.type !== "forward") continue
+      const source = nodeById(this.graph, edge.from)
+      if (!source || isCheckpointNode(source)) continue
+      const run = this.runInRound(source.id, this.round) ?? latestRun(this.run.nodes[source.id])
+      if (!run) continue
+      result.push({
+        label: nodeLabel(source),
+        output: run.output ?? "",
+        ...(run.status === "failed" ? { failed: true, error: run.error } : {}),
+      })
+    }
+    return result
   }
 
   private handlePassEnd(): void {

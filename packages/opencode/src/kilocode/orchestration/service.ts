@@ -16,7 +16,11 @@ type Entry = { scheduler: OrchestrationScheduler; run: OrchestrationRun; pending
 type State = { runs: Map<string, Entry>; saved: Map<string, OrchestrationRun> }
 
 export interface Interface {
-  readonly start: (input: { graph: OrchestrationGraph; input: string; concurrency?: number }) => Effect.Effect<OrchestrationRun, InvalidGraphError>
+  readonly start: (input: {
+    graph: OrchestrationGraph
+    input: string
+    concurrency?: number
+  }) => Effect.Effect<OrchestrationRun, InvalidGraphError>
   readonly get: (runID: RunID) => Effect.Effect<OrchestrationRun, RunNotFoundError>
   readonly cancel: (runID: RunID) => Effect.Effect<OrchestrationRun, RunNotFoundError>
   readonly checkpoint: (input: {
@@ -35,24 +39,26 @@ export const layer = Layer.effect(
     const agents = yield* Agent.Service
     const bus = yield* Bus.Service
     const storage = yield* Storage.Service
-    const state = yield* InstanceState.make<State>((ctx) => Effect.gen(function* () {
-      const keys = yield* storage.list(["orchestration", "run"])
-      const saved = new Map<string, OrchestrationRun>()
-      for (const key of keys) {
-        const run = yield* storage.read<OrchestrationRun>(key).pipe(Effect.catch(() => Effect.succeed(undefined)))
-        if (!run || run.directory !== ctx.directory) continue
-        if (run.status === "running" || run.status === "waiting-for-user") {
-          run.status = "failed"
-          run.error = "The CLI backend stopped before this orchestration run completed"
-          run.waiting = undefined
-          run.updatedAt = Date.now()
-          run.revision++
-          yield* storage.write(key, run)
+    const state = yield* InstanceState.make<State>((ctx) =>
+      Effect.gen(function* () {
+        const keys = yield* storage.list(["orchestration", "run"])
+        const saved = new Map<string, OrchestrationRun>()
+        for (const key of keys) {
+          const run = yield* storage.read<OrchestrationRun>(key).pipe(Effect.catch(() => Effect.succeed(undefined)))
+          if (!run || run.directory !== ctx.directory) continue
+          if (run.status === "running" || run.status === "waiting-for-user") {
+            run.status = "failed"
+            run.error = "The CLI backend stopped before this orchestration run completed"
+            run.waiting = undefined
+            run.updatedAt = Date.now()
+            run.revision++
+            yield* storage.write(key, run)
+          }
+          saved.set(run.id, run)
         }
-        saved.set(run.id, run)
-      }
-      return { runs: new Map(), saved }
-    }).pipe(Effect.orDie))
+        return { runs: new Map(), saved }
+      }).pipe(Effect.orDie),
+    )
 
     const get = Effect.fn("Orchestration.get")(function* (runID: RunID) {
       const current = yield* InstanceState.get(state)
@@ -76,6 +82,11 @@ export const layer = Layer.effect(
           round: event.round,
           prompt: event.prompt,
           options: event.options,
+          ...(event.title ? { title: event.title } : {}),
+          ...(event.displayMode ? { displayMode: event.displayMode } : {}),
+          ...(event.inputMode ? { inputMode: event.inputMode } : {}),
+          ...(event.inputPlaceholder ? { inputPlaceholder: event.inputPlaceholder } : {}),
+          ...(event.context ? { context: event.context } : {}),
         }
       } else if (event.type === "checkpoint-resolved") {
         run.waiting = undefined
@@ -100,7 +111,10 @@ export const layer = Layer.effect(
 
     const start: Interface["start"] = Effect.fn("Orchestration.start")(function* (input) {
       const list = yield* agents.list()
-      const issues = validateGraph(input.graph, list.map((agent) => agent.name))
+      const issues = validateGraph(
+        input.graph,
+        list.map((agent) => agent.name),
+      )
       if (issues.length) return yield* new InvalidGraphError({ issues })
       const ctx = yield* InstanceState.context
       const bridge = yield* EffectBridge.make()
@@ -135,10 +149,17 @@ export const layer = Layer.effect(
     const checkpoint: Interface["checkpoint"] = Effect.fn("Orchestration.checkpoint")(function* (input) {
       const current = yield* InstanceState.get(state)
       const entry = current.runs.get(input.runID)
-      if (!entry) return yield* new RunNotFoundError({ runID: input.runID, message: `Orchestration run not found: ${input.runID}` })
+      if (!entry)
+        return yield* new RunNotFoundError({
+          runID: input.runID,
+          message: `Orchestration run not found: ${input.runID}`,
+        })
       const run = entry.run
       if (!run.waiting || run.waiting.nodeId !== input.nodeId) {
-        return yield* new InvalidCheckpointError({ runID: input.runID, message: "The run is not waiting at this checkpoint" })
+        return yield* new InvalidCheckpointError({
+          runID: input.runID,
+          message: "The run is not waiting at this checkpoint",
+        })
       }
       if (!run.waiting.options.some((option) => option.id === input.outcome)) {
         return yield* new InvalidCheckpointError({ runID: input.runID, message: "Unknown checkpoint outcome" })

@@ -5,7 +5,15 @@
 
 import { mkdir, readdir, readFile, rm, writeFile } from "fs/promises"
 import path from "path"
-import { coerceGraph, createGraph, summarize, type GraphSummary, type OrchestrationGraph } from "./domain"
+import {
+  addOrchestrationEntry,
+  coerceGraph,
+  createGraph,
+  renameOrchestrationNodes,
+  summarize,
+  type GraphSummary,
+  type OrchestrationGraph,
+} from "./domain"
 
 export const FOLDER = "orchestration"
 
@@ -78,7 +86,10 @@ export async function persistGraph(
 ): Promise<{ saved: OrchestrationGraph; previous: OrchestrationGraph | null }> {
   const previous = persisted && graph.id ? await readGraph(configDir, graph.id) : null
   const id = previous ? previous.id : await uniqueId(configDir, graph.id || graph.name)
-  return { saved: await writeGraph(configDir, { ...graph, id }), previous }
+  const next = previous
+    ? renameOrchestrationNodes({ ...graph, id }, previous.name)
+    : addOrchestrationEntry({ ...graph, id })
+  return { saved: await writeGraph(configDir, next), previous }
 }
 
 export async function deleteGraph(configDir: string, id: string): Promise<void> {
@@ -112,11 +123,11 @@ export async function duplicateGraph(configDir: string, id: string): Promise<Orc
     name: graph.name,
     updatedAt: new Date().toISOString(),
   }
-  return writeGraph(configDir, copy)
+  return writeGraph(configDir, renameOrchestrationNodes(copy, source.name))
 }
 
 export async function renameGraph(configDir: string, id: string, name: string): Promise<OrchestrationGraph | null> {
   const graph = await readGraph(configDir, id)
   if (!graph) return null
-  return writeGraph(configDir, { ...graph, name })
+  return writeGraph(configDir, renameOrchestrationNodes({ ...graph, name }, graph.name))
 }

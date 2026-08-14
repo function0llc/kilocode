@@ -7,6 +7,7 @@ import {
   PublishError,
   syncPublishedAgent,
   unpublishGraph,
+  upsertPublishedAgent,
 } from "../../src/orchestration/publish"
 
 function graph(patch: Partial<OrchestrationGraph>): OrchestrationGraph {
@@ -126,6 +127,49 @@ describe("orchestration publish", () => {
     }
 
     expect(await syncPublishedAgent(client as never, "/repo", graph({ id: "plan", name: "New Name" }))).toBe(true)
+    expect(patches).toEqual([
+      {
+        directory: "/repo",
+        scope: "global",
+        set: {
+          agent: {
+            "new-name": {
+              mode: "primary",
+              displayName: "New Name",
+              description: 'Deterministic orchestration "New Name"',
+              prompt: null,
+              options: { kiloOrchestration: { version: 2, graph: { id: "plan", scope: "global" } } },
+            },
+          },
+        },
+        unset: [["agent", "old-name"]],
+      },
+    ])
+  })
+
+  it("creates an orchestrator agent on save and removes an older slug", async () => {
+    const patches: unknown[] = []
+    const client = {
+      config: {
+        overlay: async () => ({
+          data: {
+            global: {
+              agent: {
+                "old-name": {
+                  options: { kiloOrchestration: { version: 2, graph: { id: "plan", scope: "global" } } },
+                },
+              },
+            },
+          },
+        }),
+        overlayUpdate: async (patch: unknown) => {
+          patches.push(patch)
+          return { data: {} }
+        },
+      },
+    }
+
+    await upsertPublishedAgent(client as never, "/repo", graph({ id: "plan", name: "New Name" }))
     expect(patches).toEqual([
       {
         directory: "/repo",

@@ -3,7 +3,7 @@ import { getErrorMessage } from "../kilo-provider-utils"
 import type { OrchestrationRequest } from "./messages"
 import { validateGraph, type OrchestrationGraph } from "./domain"
 import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError, syncPublishedAgent, unpublishGraph } from "./publish"
+import { buildAgentConfigFromGraph, PublishError, unpublishGraph, upsertPublishedAgent } from "./publish"
 
 type Options = {
   client: () => KiloClient
@@ -64,13 +64,10 @@ export class OrchestrationBridge {
   private async save(graph: OrchestrationGraph, persisted: boolean) {
     const dir = await this.opts.configDir()
     const result = await persistGraph(dir, graph, persisted)
-    const renamed =
-      result.previous !== null &&
-      result.previous.name !== result.saved.name &&
-      (await syncPublishedAgent(this.opts.client(), this.opts.directory(), result.saved))
+    await upsertPublishedAgent(this.opts.client(), this.opts.directory(), result.saved)
     this.opts.post({ type: "orchestration.saved", graph: result.saved })
     await this.graphs()
-    if (renamed) await this.opts.refreshAgents?.()
+    await this.opts.refreshAgents?.()
   }
 
   private async remove(id: string) {
@@ -91,10 +88,10 @@ export class OrchestrationBridge {
   private async rename(id: string, name: string) {
     const graph = await renameGraph(await this.opts.configDir(), id, name.trim() || "Untitled")
     if (!graph) return this.fail("renameGraph", "Graph not found")
-    const renamed = await syncPublishedAgent(this.opts.client(), this.opts.directory(), graph)
+    await upsertPublishedAgent(this.opts.client(), this.opts.directory(), graph)
     this.opts.post({ type: "orchestration.saved", graph })
     await this.graphs()
-    if (renamed) await this.opts.refreshAgents?.()
+    await this.opts.refreshAgents?.()
   }
 
   private async publish(id: string) {

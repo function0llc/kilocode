@@ -1,4 +1,4 @@
-import { createMemo, createSignal, onCleanup, Show, type Component } from "solid-js"
+import { createMemo, createSignal, For, onCleanup, Show, type Component } from "solid-js"
 import { createStore, produce, reconcile, unwrap } from "solid-js/store"
 import { showToast } from "@kilocode/kilo-ui/toast"
 import { Button } from "@kilocode/kilo-ui/button"
@@ -311,7 +311,7 @@ export const Editor: Component<Props> = (props) => {
           selected={selected}
           onSelect={setSelected}
           mutate={mutate}
-          knownAgents={knownAgents}
+          agents={data.agents}
           api={api}
         />
         <div class="orch-inspector-shell" style={{ width: `${inspectorWidth()}px` }}>
@@ -344,13 +344,35 @@ export const Editor: Component<Props> = (props) => {
       <Show when={run()?.waiting}>
         {(waiting) => (
           <div class="orch-checkpoint-bar">
-            <strong>{waiting().prompt}</strong>
-            <TextField value={feedback()} placeholder={t("orchestration.run.feedback")} onChange={setFeedback} />
+            <strong>{waiting().title ?? waiting().prompt}</strong>
+            <Show when={!!waiting().context?.length}>
+              <div class="orch-checkpoint-context">
+                <For each={waiting().context!}>
+                  {(item) => (
+                    <div class="orch-checkpoint-context-item">
+                      <div class="orch-checkpoint-context-label">{item.label}</div>
+                      <pre>{item.output}</pre>
+                      <Show when={item.failed}>
+                        <div class="orch-checkpoint-context-error">{item.error}</div>
+                      </Show>
+                    </div>
+                  )}
+                </For>
+              </div>
+            </Show>
+            <Show when={(waiting().inputMode ?? "optional") !== "none"}>
+              <TextField
+                value={feedback()}
+                placeholder={waiting().inputPlaceholder ?? t("orchestration.run.feedback")}
+                onChange={setFeedback}
+              />
+            </Show>
             <div class="orch-checkpoint-options">
               {waiting().options.map((option) => (
                 <Button
                   size="small"
                   variant="primary"
+                  disabled={waiting().inputMode === "required" && !feedback().trim()}
                   onClick={() => {
                     const current = run()
                     if (!current) return

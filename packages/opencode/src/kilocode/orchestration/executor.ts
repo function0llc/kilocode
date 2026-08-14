@@ -10,6 +10,7 @@ import { SessionPrompt } from "@/session/prompt"
 import { ModelV2 } from "@opencode-ai/core/model"
 import { ProviderV2 } from "@opencode-ai/core/provider"
 import { Effect } from "effect"
+import { binding } from "./binding"
 import { isAgentNode, nodeById, type AgentNode, type OrchestrationGraph } from "./domain"
 import { registerAgent } from "./effective-agent"
 import { buildSystemPrompt, buildUserPrompt } from "./prompt"
@@ -19,6 +20,10 @@ import type { NodeExecution, NodeExecutor, NodeResult } from "./scheduler"
 type Options = {
   parentID?: Session.Info["id"]
   platform?: string
+}
+
+export function isVirtualEntry(graph: OrchestrationGraph, options: Record<string, unknown>): boolean {
+  return binding(options.kiloOrchestration)?.graph.id === graph.id
 }
 
 export class SessionNodeExecutor implements NodeExecutor {
@@ -62,6 +67,7 @@ export class SessionNodeExecutor implements NodeExecutor {
       const mcp = yield* MCP.Service
       const source = yield* agents.get(node.source.agentName)
       if (!source) return { error: `Agent not found: ${node.source.agentName}` }
+      if (isVirtualEntry(self.graph, source.options)) return { output: input.input }
       yield* agents.guardRequirements(source)
 
       const fallback = yield* provider.defaultModel()

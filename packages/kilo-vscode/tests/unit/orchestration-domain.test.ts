@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test"
 import {
+  agentRole,
   coerceGraph,
   connectError,
   createAgentNode,
@@ -59,6 +60,19 @@ describe("orchestration domain", () => {
     ).toBe(false)
   })
 
+  it("classifies agents using the Agents tab metadata", () => {
+    expect(agentRole({ mode: "primary" })).toBe("agent")
+    expect(agentRole({ mode: "all" })).toBe("agent")
+    expect(agentRole({ mode: "subagent" })).toBe("subagent")
+    expect(
+      agentRole({
+        mode: "primary",
+        options: { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } },
+      }),
+    ).toBe("orchestrator")
+    expect(agentRole(undefined)).toBeUndefined()
+  })
+
   it("reads names from current and legacy orchestration agents", () => {
     const options = { kiloOrchestration: { version: 2, graph: { id: "demo", scope: "global" } } }
     expect(orchestrationAgentName({ displayName: "Current Name", description: "ignored", options })).toBe(
@@ -77,6 +91,54 @@ describe("orchestration domain", () => {
     renamed.overrides.displayName = "Planner A"
     expect(nodeLabel(renamed)).toBe("Planner A")
     expect(nodeLabel(createCheckpointNode("c", { x: 0, y: 0 }))).toBe("User checkpoint")
+  })
+
+  it("creates checkpoint nodes with default display and input config", () => {
+    const cp = createCheckpointNode("cp", { x: 0, y: 0 })
+    expect(cp.display?.mode).toBe("predecessors")
+    expect(cp.input?.mode).toBe("optional")
+  })
+
+  it("coerces checkpoint display and input fields with defaults", () => {
+    const g = coerceGraph({
+      id: "g",
+      name: "Test",
+      nodes: [{ id: "cp", kind: "checkpoint", position: { x: 0, y: 0 }, prompt: "OK?", options: [] }],
+      edges: [],
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    })!
+    const cp = g.nodes[0]!
+    expect(cp.kind).toBe("checkpoint")
+    if (cp.kind === "checkpoint") {
+      expect(cp.display?.mode).toBe("predecessors")
+      expect(cp.input?.mode).toBe("optional")
+    }
+  })
+
+  it("coerces checkpoint display and input with explicit values", () => {
+    const g = coerceGraph({
+      id: "g",
+      name: "Test",
+      nodes: [
+        {
+          id: "cp",
+          kind: "checkpoint",
+          position: { x: 0, y: 0 },
+          prompt: "OK?",
+          options: [],
+          display: { mode: "none" },
+          input: { mode: "required", placeholder: "Enter details" },
+        },
+      ],
+      edges: [],
+      updatedAt: "2026-01-01T00:00:00.000Z",
+    })!
+    const cp = g.nodes[0]!
+    if (cp.kind === "checkpoint") {
+      expect(cp.display?.mode).toBe("none")
+      expect(cp.input?.mode).toBe("required")
+      expect(cp.input?.placeholder).toBe("Enter details")
+    }
   })
 
   it("flags a graph with no entry node", () => {

@@ -22,6 +22,7 @@ import OrchestrationTab from "./OrchestrationTab"
 import { mcpConfigScope, mcpEnabledPatch, selectedDefaultAgentValue } from "./agent-behaviour-patches"
 import { parseImport, MAX_IMPORT_SIZE } from "./mode-io"
 import type { ImportError } from "./mode-io"
+import { isOrchestrationAgent } from "../../../../src/orchestration/domain"
 
 type SubtabId = "agents" | "orchestration" | "mcpServers" | "rules" | "workflows" | "skills"
 
@@ -408,6 +409,19 @@ const AgentBehaviourTab: Component = () => {
                             }}
                           >
                             custom
+                          </span>
+                        </Show>
+                        <Show when={isOrchestrationAgent(agent())}>
+                          <span
+                            style={{
+                              "font-size": "var(--kilo-font-size-10)",
+                              padding: "1px 5px",
+                              "border-radius": "3px",
+                              background: "var(--bg-subtle-base, var(--vscode-badge-background))",
+                              color: "var(--text-weak-base, var(--vscode-badge-foreground))",
+                            }}
+                          >
+                            orchestrator
                           </span>
                         </Show>
                         <Show when={agent()?.mode === "subagent"}>

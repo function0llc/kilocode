@@ -2,7 +2,7 @@
 // Orchestration run state: persisted snapshot of one workflow execution.
 // Pure types + a factory; the scheduler mutates and exposes it.
 
-import { createId, type OrchestrationGraph } from "./domain"
+import { createId, type CheckpointContextItem, type OrchestrationGraph } from "./domain"
 
 export type RunStatus = "running" | "waiting-for-user" | "completed" | "failed" | "cancelled"
 
@@ -50,6 +50,11 @@ export type OrchestrationRun = {
     round: number
     prompt: string
     options: Array<{ id: string; label: string }>
+    title?: string
+    displayMode?: "none" | "predecessors"
+    inputMode?: "none" | "optional" | "required"
+    inputPlaceholder?: string
+    context?: CheckpointContextItem[]
   }
   error?: string
   output?: string

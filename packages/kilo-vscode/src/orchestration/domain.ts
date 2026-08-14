@@ -67,12 +67,31 @@ export type AgentNode = {
 
 export type CheckpointOption = { id: string; label: string }
 
+export type CheckpointDisplay = {
+  mode: "none" | "predecessors"
+  title?: string
+}
+
+export type CheckpointInput = {
+  mode: "none" | "optional" | "required"
+  placeholder?: string
+}
+
+export type CheckpointContextItem = {
+  label: string
+  output: string
+  failed?: boolean
+  error?: string
+}
+
 export type CheckpointNode = {
   id: string
   kind: "checkpoint"
   position: { x: number; y: number }
   prompt: string
   options: CheckpointOption[]
+  display?: CheckpointDisplay
+  input?: CheckpointInput
 }
 
 export type OrchestrationNode = AgentNode | CheckpointNode
@@ -106,8 +125,11 @@ export type GraphSummary = {
 export type OrchestrationAgentLike = {
   displayName?: string
   description?: string
+  mode?: string
   options?: Record<string, unknown>
 }
+
+type AgentRole = "agent" | "subagent" | "orchestrator"
 
 export function isOrchestrationAgent(agent: OrchestrationAgentLike | null | undefined): boolean {
   const value = agent?.options?.kiloOrchestration
@@ -118,6 +140,12 @@ export function isOrchestrationAgent(agent: OrchestrationAgentLike | null | unde
   }
   const graph = binding.graph as Record<string, unknown>
   return typeof graph.id === "string" && graph.id.length > 0 && graph.scope === "global"
+}
+
+export function agentRole(agent: OrchestrationAgentLike | null | undefined): AgentRole | undefined {
+  if (!agent) return undefined
+  if (isOrchestrationAgent(agent)) return "orchestrator"
+  return agent.mode === "subagent" ? "subagent" : "agent"
 }
 
 export function orchestrationAgentName(agent: OrchestrationAgentLike): string | undefined {
@@ -172,6 +200,33 @@ export function createGraph(name: string): OrchestrationGraph {
   }
 }
 
+export function addOrchestrationEntry(graph: OrchestrationGraph): OrchestrationGraph {
+  const id = createId("node")
+  const node = createAgentNode(id, slugify(graph.name), { x: 0, y: 0 })
+  node.overrides.displayName = graph.name
+  return { ...graph, entryNodeId: id, nodes: [node, ...graph.nodes] }
+}
+
+export function renameOrchestrationNodes(graph: OrchestrationGraph, previousName: string): OrchestrationGraph {
+  const previous = slugify(previousName)
+  const next = slugify(graph.name)
+  if (previous === next && previousName === graph.name) return graph
+  return {
+    ...graph,
+    nodes: graph.nodes.map((node) => {
+      if (!isAgentNode(node) || node.source.agentName !== previous) return node
+      return {
+        ...node,
+        source: { agentName: next },
+        overrides: {
+          ...node.overrides,
+          ...(node.overrides.displayName === previousName ? { displayName: graph.name } : {}),
+        },
+      }
+    }),
+  }
+}
+
 export function createAgentNode(id: string, agentName: string, position: { x: number; y: number }): AgentNode {
   return {
     id,
@@ -191,6 +246,8 @@ export function createCheckpointNode(id: string, position: { x: number; y: numbe
     position,
     prompt: "",
     options: [],
+    display: { mode: "predecessors" },
+    input: { mode: "optional" },
   }
 }
 
@@ -320,6 +377,24 @@ function coerceRuntime(value: unknown): NodeRuntime {
   return out
 }
 
+function coerceCheckpointDisplay(value: unknown): CheckpointDisplay {
+  const raw = asRecord(value)
+  if (!raw) return { mode: "predecessors" }
+  return {
+    mode: raw.mode === "none" ? "none" : "predecessors",
+    ...(typeof raw.title === "string" && raw.title ? { title: raw.title } : {}),
+  }
+}
+
+function coerceCheckpointInput(value: unknown): CheckpointInput {
+  const raw = asRecord(value)
+  if (!raw) return { mode: "optional" }
+  return {
+    mode: raw.mode === "none" ? "none" : raw.mode === "required" ? "required" : "optional",
+    ...(typeof raw.placeholder === "string" && raw.placeholder ? { placeholder: raw.placeholder } : {}),
+  }
+}
+
 function coerceCapabilities(value: unknown): AgentNode["capabilities"] {
   const raw = asRecord(value)
   return {
@@ -349,6 +424,8 @@ function coerceNode(value: unknown): OrchestrationNode | null {
             })
             .filter((option): option is CheckpointOption => option !== null)
         : [],
+      display: coerceCheckpointDisplay(raw.display),
+      input: coerceCheckpointInput(raw.input),
     }
   }
 

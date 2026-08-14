@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test"
-import type { AgentNode } from "../../../src/kilocode/orchestration/domain"
-import { capabilityRules } from "../../../src/kilocode/orchestration/executor"
+import type { AgentNode, OrchestrationGraph } from "../../../src/kilocode/orchestration/domain"
+import { capabilityRules, isVirtualEntry } from "../../../src/kilocode/orchestration/executor"
 import type { EffectiveAgent } from "../../../src/kilocode/orchestration/resolver"
 
 const effective: EffectiveAgent = {
@@ -37,5 +37,21 @@ describe("orchestration capability rules", () => {
     expect(rules).toContainEqual({ permission: "internal_db_*", pattern: "*", action: "deny" })
     expect(rules).toContainEqual({ permission: "read", pattern: "mcp:internal.db:*", action: "deny" })
     expect(rules).not.toContainEqual({ permission: "github_*", pattern: "*", action: "deny" })
+  })
+})
+
+describe("orchestration virtual entry", () => {
+  const graph = { id: "plan" } as OrchestrationGraph
+
+  it("recognizes an agent bound to the current graph", () => {
+    expect(isVirtualEntry(graph, { kiloOrchestration: { version: 2, graph: { id: "plan", scope: "global" } } })).toBe(
+      true,
+    )
+  })
+
+  it("does not treat another orchestration as the virtual entry", () => {
+    expect(isVirtualEntry(graph, { kiloOrchestration: { version: 2, graph: { id: "other", scope: "global" } } })).toBe(
+      false,
+    )
   })
 })

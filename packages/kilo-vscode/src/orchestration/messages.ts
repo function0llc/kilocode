@@ -3,10 +3,20 @@
 // Palette data (agents/skills/MCP) reuses the existing requestAgents /
 // requestSkills / requestMcpStatus messages, so no new request types there.
 
-import type { GraphSummary, OrchestrationGraph } from "./domain"
+import type { GraphSummary, OrchestrationGraph, CheckpointContextItem } from "./domain"
 import type { OrchestrationStartResponse } from "@kilocode/sdk/v2"
 
-export type OrchestrationRun = OrchestrationStartResponse
+type WaitingInfo = NonNullable<OrchestrationStartResponse["waiting"]> & {
+  title?: string
+  displayMode?: "none" | "predecessors"
+  inputMode?: "none" | "optional" | "required"
+  inputPlaceholder?: string
+  context?: CheckpointContextItem[]
+}
+
+export type OrchestrationRun = Omit<OrchestrationStartResponse, "waiting"> & {
+  waiting?: WaitingInfo
+}
 
 export type OrchestrationRequest =
   | { type: "orchestration.listGraphs" }

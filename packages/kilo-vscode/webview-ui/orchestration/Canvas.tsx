@@ -2,6 +2,7 @@ import { createSignal, For, onCleanup, onMount, Show, type Component } from "sol
 import { showToast } from "@kilocode/kilo-ui/toast"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import {
+  agentRole,
   connectError,
   createAgentNode,
   createEdge,
@@ -13,6 +14,7 @@ import {
   NODE_WIDTH,
 } from "../../src/orchestration/domain"
 import type { OrchestrationGraph, OrchestrationNode } from "../../src/orchestration/domain"
+import type { AgentInfo } from "../src/types/messages"
 import {
   getDrag,
   PALETTE_DROP,
@@ -33,7 +35,7 @@ interface Props {
   selected: () => Selection | null
   onSelect: (selection: Selection | null) => void
   mutate: (fn: (graph: OrchestrationGraph) => void) => void
-  knownAgents: () => Set<string>
+  agents: () => AgentInfo[]
   api: CanvasApi
 }
 
@@ -360,8 +362,13 @@ export const Canvas: Component<Props> = (props) => {
   })
 
   const unresolved = (node: OrchestrationNode) => {
-    const roster = props.knownAgents()
-    return isAgentNode(node) && roster.size > 0 && !roster.has(node.source.agentName)
+    const roster = props.agents()
+    return isAgentNode(node) && roster.length > 0 && !roster.some((agent) => agent.name === node.source.agentName)
+  }
+
+  const info = (node: OrchestrationNode) => {
+    if (!isAgentNode(node)) return undefined
+    return props.agents().find((agent) => agent.name === node.source.agentName)
   }
 
   const nodeRun = (id: string) => props.run()?.nodes[id]?.at(-1)
@@ -501,7 +508,10 @@ export const Canvas: Component<Props> = (props) => {
             const selected = () => props.selected()?.kind === "node" && props.selected()?.id === node.id
             const name = () => nodeLabel(node)
             const isAgent = () => isAgentNode(node)
-            const kindText = () => (isAgent() ? "agent" : "checkpoint")
+            const kindText = () => {
+              if (!isAgentNode(node)) return "checkpoint"
+              return t(`orchestration.agent.${agentRole(info(node)) ?? "agent"}`)
+            }
             const agent = () => {
               if (!isAgentNode(node)) return null
               return node.capabilities.skills.length + node.capabilities.mcpServers.length > 0 ? node : null

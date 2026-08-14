@@ -11,7 +11,10 @@ const Rule = Schema.Struct({
   pattern: Schema.optional(Schema.String),
   action: Schema.Literals(["allow", "ask", "deny"]),
 })
-const Prompt = Schema.Struct({ mode: Schema.Literals(["inherit", "append", "replace"]), text: Schema.optional(Schema.String) })
+const Prompt = Schema.Struct({
+  mode: Schema.Literals(["inherit", "append", "replace"]),
+  text: Schema.optional(Schema.String),
+})
 const Overrides = Schema.Struct({
   displayName: Schema.optional(Schema.NullOr(Schema.String)),
   description: Schema.optional(Schema.NullOr(Schema.String)),
@@ -38,12 +41,28 @@ const AgentNode = Schema.Struct({
   capabilities: Schema.Struct({ skills: Schema.Array(Schema.String), mcpServers: Schema.Array(Schema.String) }),
   runtime: Runtime,
 })
+const CheckpointDisplaySchema = Schema.Struct({
+  mode: Schema.Literals(["none", "predecessors"]),
+  title: Schema.optional(Schema.String),
+})
+const CheckpointInputSchema = Schema.Struct({
+  mode: Schema.Literals(["none", "optional", "required"]),
+  placeholder: Schema.optional(Schema.String),
+})
+const CheckpointContextItemSchema = Schema.Struct({
+  label: Schema.String,
+  output: Schema.String,
+  failed: Schema.optional(Schema.Boolean),
+  error: Schema.optional(Schema.String),
+})
 const CheckpointNode = Schema.Struct({
   id: Schema.String,
   kind: Schema.Literal("checkpoint"),
   position: Position,
   prompt: Schema.String,
   options: Schema.Array(Schema.Struct({ id: Schema.String, label: Schema.String })),
+  display: Schema.optional(CheckpointDisplaySchema),
+  input: Schema.optional(CheckpointInputSchema),
 })
 const Edge = Schema.Struct({
   id: Schema.String,
@@ -102,6 +121,11 @@ export const Run = Schema.Struct({
       round: Schema.Number,
       prompt: Schema.String,
       options: Schema.Array(Schema.Struct({ id: Schema.String, label: Schema.String })),
+      title: Schema.optional(Schema.String),
+      displayMode: Schema.optional(Schema.Literals(["none", "predecessors"])),
+      inputMode: Schema.optional(Schema.Literals(["none", "optional", "required"])),
+      inputPlaceholder: Schema.optional(Schema.String),
+      context: Schema.optional(Schema.Array(CheckpointContextItemSchema)),
     }),
   ),
   createdAt: Schema.Number,
@@ -111,7 +135,11 @@ export const Run = Schema.Struct({
   output: Schema.optional(Schema.String),
 })
 
-export const StartPayload = Schema.Struct({ graph: Graph, input: Schema.String, concurrency: Schema.optional(Schema.Number) })
+export const StartPayload = Schema.Struct({
+  graph: Graph,
+  input: Schema.String,
+  concurrency: Schema.optional(Schema.Number),
+})
 export const CheckpointPayload = Schema.Struct({
   nodeId: Schema.String,
   outcome: Schema.String,

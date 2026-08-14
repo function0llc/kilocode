@@ -103,6 +103,38 @@ describe("orchestration graph storage", () => {
     expect((await listGraphs(configDir)).map((item) => item.name)).toEqual(["After"])
   })
 
+  it("adds the published orchestrator as a new graph's default entry", async () => {
+    const result = await persistGraph(configDir, seed("Release Plan"), false)
+    expect(result.saved.nodes).toHaveLength(1)
+    expect(result.saved.entryNodeId).toBe(result.saved.nodes[0].id)
+    const entry = result.saved.nodes[0]
+    expect(entry.kind).toBe("agent")
+    if (entry.kind === "agent") {
+      expect(entry.source.agentName).toBe("release-plan")
+      expect(entry.overrides.displayName).toBe("Release Plan")
+      expect(entry.position).toEqual({ x: 0, y: 0 })
+    }
+  })
+
+  it("renames an existing orchestrator node without restoring a removed one", async () => {
+    const created = await persistGraph(configDir, seed("Before"), false)
+    const renamed = await persistGraph(configDir, { ...created.saved, name: "After" }, true)
+    const entry = renamed.saved.nodes[0]
+    expect(entry.kind).toBe("agent")
+    if (entry.kind === "agent") {
+      expect(entry.source.agentName).toBe("after")
+      expect(entry.overrides.displayName).toBe("After")
+    }
+
+    const removed = await persistGraph(
+      configDir,
+      { ...renamed.saved, name: "Final", entryNodeId: null, nodes: [] },
+      true,
+    )
+    expect(removed.saved.nodes).toEqual([])
+    expect(removed.saved.entryNodeId).toBeNull()
+  })
+
   it("gives a new graph a unique id instead of overwriting a slug collision", async () => {
     await writeGraph(configDir, seed("Existing", { id: "same" }))
     const result = await persistGraph(configDir, seed("New", { id: "same" }), false)

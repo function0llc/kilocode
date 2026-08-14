@@ -293,6 +293,121 @@ describe("orchestration scheduler", () => {
     expect(scheduler.snapshot().checkpoints["cp"]?.[0]?.outcome).toBe("accept")
   })
 
+  it("passes checkpoint decision as predecessor output to downstream nodes", async () => {
+    const executor = new FakeExecutor()
+    executor.add("d", { output: "D" })
+    executor.add("e", { output: "E" })
+    const item = graph({
+      entryNodeId: "a",
+      nodes: [
+        agent("a", "plan"),
+        agent("d", "reconcile"),
+        checkpoint("cp", "OK?", [{ id: "accept", label: "Accept" }]),
+        agent("e", "ship"),
+      ],
+      edges: [
+        edge("e1", "a", "d"),
+        edge("e2", "d", "cp"),
+        { ...edge("e3", "cp", "e"), route: { type: "forward", outcome: "accept" } },
+      ],
+    })
+    const scheduler = new OrchestrationScheduler(item, "plan", executor)
+    const tracked = eventsOf(scheduler)
+    await scheduler.start()
+    await waitFor(scheduler, (snapshot) => snapshot.status === "waiting-for-user")
+
+    await scheduler.respond("cp", "accept", "ship it")
+    await tracked.wait()
+
+    const e = executor.calls.find((call) => call.nodeId === "e")!
+    expect(e.predecessors.length).toBe(1)
+    expect(e.predecessors[0]!.label).toBe("User checkpoint")
+    expect(e.predecessors[0]!.output).toContain("Accept")
+    expect(e.predecessors[0]!.output).toContain("ship it")
+  })
+
+  it("emits checkpoint context when display mode is predecessors", async () => {
+    const executor = new FakeExecutor()
+    executor.add("d", { output: "D-output" })
+    executor.add("e", { output: "E" })
+    const item = graph({
+      entryNodeId: "a",
+      nodes: [
+        agent("a", "plan"),
+        agent("d", "reconcile"),
+        {
+          id: "cp",
+          kind: "checkpoint",
+          position: { x: 0, y: 0 },
+          prompt: "OK?",
+          options: [{ id: "accept", label: "Accept" }],
+          display: { mode: "predecessors" },
+          input: { mode: "optional" },
+        } as CheckpointNode,
+        agent("e", "ship"),
+      ],
+      edges: [
+        edge("e1", "a", "d"),
+        edge("e2", "d", "cp"),
+        { ...edge("e3", "cp", "e"), route: { type: "forward", outcome: "accept" } },
+      ],
+    })
+    const scheduler = new OrchestrationScheduler(item, "plan", executor)
+    const tracked = eventsOf(scheduler)
+    await scheduler.start()
+    await waitFor(scheduler, (snapshot) => snapshot.status === "waiting-for-user")
+
+    const waiting = tracked.events.find((event) => event.type === "checkpoint-waiting")
+    expect(waiting?.type === "checkpoint-waiting").toBe(true)
+    if (waiting?.type === "checkpoint-waiting") {
+      expect(waiting.displayMode).toBe("predecessors")
+      expect(waiting.context?.length).toBe(1)
+      expect(waiting.context?.[0]?.label).toBe("reconcile")
+      expect(waiting.context?.[0]?.output).toBe("D-output")
+    }
+    scheduler.cancel()
+  })
+
+  it("does not emit context when display mode is none", async () => {
+    const executor = new FakeExecutor()
+    executor.add("d", { output: "D-output" })
+    executor.add("e", { output: "E" })
+    const item = graph({
+      entryNodeId: "a",
+      nodes: [
+        agent("a", "plan"),
+        agent("d", "reconcile"),
+        {
+          id: "cp",
+          kind: "checkpoint",
+          position: { x: 0, y: 0 },
+          prompt: "OK?",
+          options: [{ id: "accept", label: "Accept" }],
+          display: { mode: "none" },
+          input: { mode: "none" },
+        } as CheckpointNode,
+        agent("e", "ship"),
+      ],
+      edges: [
+        edge("e1", "a", "d"),
+        edge("e2", "d", "cp"),
+        { ...edge("e3", "cp", "e"), route: { type: "forward", outcome: "accept" } },
+      ],
+    })
+    const scheduler = new OrchestrationScheduler(item, "plan", executor)
+    const tracked = eventsOf(scheduler)
+    await scheduler.start()
+    await waitFor(scheduler, (snapshot) => snapshot.status === "waiting-for-user")
+
+    const waiting = tracked.events.find((event) => event.type === "checkpoint-waiting")
+    if (waiting?.type === "checkpoint-waiting") {
+      expect(waiting.displayMode).toBe("none")
+      expect(waiting.context).toBeUndefined()
+      expect(waiting.inputMode).toBe("none")
+    }
+    scheduler.cancel()
+  })
+
   it("reprocesses through a bounded loop and continues forward on acceptance", async () => {
     const executor = new FakeExecutor()
     const item = graph({

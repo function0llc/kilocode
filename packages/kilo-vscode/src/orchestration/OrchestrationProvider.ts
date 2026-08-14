@@ -7,7 +7,7 @@ import { type KiloConnectionService, ServerStartupError } from "../services/cli-
 import { computeDefaultSelection, fetchProviderData } from "../provider-actions"
 import { validateGraph, type OrchestrationGraph } from "./domain"
 import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError, syncPublishedAgent, unpublishGraph } from "./publish"
+import { buildAgentConfigFromGraph, PublishError, unpublishGraph, upsertPublishedAgent } from "./publish"
 import type { OrchestrationRequest } from "./messages"
 import type { OrchestrationStartData } from "@kilocode/sdk/v2"
 
@@ -260,16 +260,11 @@ export class OrchestrationProvider implements vscode.Disposable {
       // already owns that file, give the newcomer a unique id instead of
       // overwriting the existing one.
       const result = await persistGraph(dir, graph, persisted)
-      const renamed =
-        result.previous !== null &&
-        result.previous.name !== result.saved.name &&
-        (await syncPublishedAgent(this.connection.getClient(), this.directory(), result.saved))
+      await upsertPublishedAgent(this.connection.getClient(), this.directory(), result.saved)
       this.post({ type: "orchestration.saved", graph: result.saved })
       await this.sendGraphs()
-      if (renamed) {
-        this.cachedAgents = null
-        await this.fetchAndSendAgents()
-      }
+      this.cachedAgents = null
+      await this.fetchAndSendAgents()
     } catch (err) {
       this.fail("saveGraph", err)
     }
@@ -311,13 +306,11 @@ export class OrchestrationProvider implements vscode.Disposable {
         this.post({ type: "orchestration.failed", operation: "renameGraph", message: "Graph not found" })
         return
       }
-      const renamed = await syncPublishedAgent(this.connection.getClient(), this.directory(), graph)
+      await upsertPublishedAgent(this.connection.getClient(), this.directory(), graph)
       this.post({ type: "orchestration.saved", graph })
       await this.sendGraphs()
-      if (renamed) {
-        this.cachedAgents = null
-        await this.fetchAndSendAgents()
-      }
+      this.cachedAgents = null
+      await this.fetchAndSendAgents()
     } catch (err) {
       this.fail("renameGraph", err)
     }

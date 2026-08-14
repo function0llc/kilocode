@@ -66,6 +66,25 @@ export async function syncPublishedAgent(
   return true
 }
 
+export async function upsertPublishedAgent(
+  client: KiloClient,
+  directory: string,
+  graph: OrchestrationGraph,
+): Promise<void> {
+  const { data } = await client.config.overlay({ directory, scope: "global" }, { throwOnError: true })
+  const result = agentConfig(graph)
+  const unset = publishedAgentPaths(data.global, graph.id).filter((path) => path[1] !== result.slug)
+  await client.config.overlayUpdate(
+    {
+      directory,
+      scope: "global",
+      set: { agent: { [result.slug]: result.config } },
+      ...(unset.length > 0 ? { unset } : {}),
+    },
+    { throwOnError: true },
+  )
+}
+
 function agentConfig(graph: OrchestrationGraph): PublishResult {
   return {
     slug: slugify(graph.name),

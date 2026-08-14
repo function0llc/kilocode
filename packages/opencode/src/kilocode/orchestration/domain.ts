@@ -58,12 +58,31 @@ export type AgentNode = {
 
 export type CheckpointOption = { id: string; label: string }
 
+export type CheckpointDisplay = {
+  mode: "none" | "predecessors"
+  title?: string
+}
+
+export type CheckpointInput = {
+  mode: "none" | "optional" | "required"
+  placeholder?: string
+}
+
+export type CheckpointContextItem = {
+  label: string
+  output: string
+  failed?: boolean
+  error?: string
+}
+
 export type CheckpointNode = {
   id: string
   kind: "checkpoint"
   position: { x: number; y: number }
   prompt: string
   options: CheckpointOption[]
+  display?: CheckpointDisplay
+  input?: CheckpointInput
 }
 
 export type OrchestrationNode = AgentNode | CheckpointNode

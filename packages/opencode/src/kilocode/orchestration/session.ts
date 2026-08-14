@@ -27,16 +27,20 @@ export function run(input: {
     if (!ref) throw new Error(`Agent "${input.agent.name}" has an invalid orchestration binding`)
     const graph = yield* Effect.promise(() => loadGraph(ref.graph.id))
     const roster = yield* input.agents.list()
-    const issues = validateGraph(graph, roster.map((agent) => agent.name))
+    const issues = validateGraph(
+      graph,
+      roster.map((agent) => agent.name),
+    )
     if (issues.length) throw new Error(issues.map((issue) => issue.message).join("; "))
     const ctx = yield* InstanceState.context
     const bridge = yield* EffectBridge.make()
     const executor = new SessionNodeExecutor(graph, ctx, { parentID: input.session.id })
     const user = input.messages.find((item) => item.info.id === input.user.id)
-    const request = user?.parts
-      .filter((part): part is SessionV1.TextPart => part.type === "text" && !part.synthetic)
-      .map((part) => part.text)
-      .join("\n") ?? ""
+    const request =
+      user?.parts
+        .filter((part): part is SessionV1.TextPart => part.type === "text" && !part.synthetic)
+        .map((part) => part.text)
+        .join("\n") ?? ""
     const scheduler = new OrchestrationScheduler(graph, request, executor)
     const msg: SessionV1.Assistant = {
       id: MessageID.ascending(),
@@ -80,24 +84,29 @@ export function run(input: {
         await bridge.promise(input.sessions.updatePart(progress))
       }
       async function checkpoint(event: Extract<SchedulerEvent, { type: "checkpoint-waiting" }>) {
-        const answers = await bridge.promise(
-          input.question.ask({
-            sessionID: input.session.id,
-            blocking: true,
-            questions: [
-              {
-                header: "Workflow",
-                question: event.prompt,
-                options: event.options.map((option) => ({ label: option.label, description: option.id })),
-                multiple: false,
-                custom: false,
-              },
-            ],
-          }),
-        ).catch(() => {
-          scheduler.cancel()
-          return []
-        })
+        const question = event.context?.length
+          ? `${event.prompt}\n\n${event.context.map((c) => `## ${c.label}\n${c.output}`).join("\n\n")}`
+          : event.prompt
+        const answers = await bridge
+          .promise(
+            input.question.ask({
+              sessionID: input.session.id,
+              blocking: true,
+              questions: [
+                {
+                  header: "Workflow",
+                  question,
+                  options: event.options.map((option) => ({ label: option.label, description: option.id })),
+                  multiple: false,
+                  custom: false,
+                },
+              ],
+            }),
+          )
+          .catch(() => {
+            scheduler.cancel()
+            return []
+          })
         const label = answers[0]?.[0]
         const option = event.options.find((item) => item.label === label)
         if (option) await scheduler.respond(event.nodeId, option.id)
@@ -107,7 +116,8 @@ export function run(input: {
         scheduler.cancel()
       })
     })
-    const output = result.output ?? (result.cancelled ? "Orchestration cancelled" : `Orchestration failed: ${result.error}`)
+    const output =
+      result.output ?? (result.cancelled ? "Orchestration cancelled" : `Orchestration failed: ${result.error}`)
     const final: SessionV1.TextPart = {
       id: PartID.ascending(),
       messageID: msg.id,

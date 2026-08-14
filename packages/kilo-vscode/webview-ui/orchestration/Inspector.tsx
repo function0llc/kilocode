@@ -4,9 +4,11 @@ import { IconButton } from "@kilocode/kilo-ui/icon-button"
 import { Icon } from "@kilocode/kilo-ui/icon"
 import { ModelSelectorBase } from "../src/components/shared/ModelSelector"
 import { useProvider } from "../src/context/provider"
-import { createId, isAgentNode, isCheckpointNode, nodeById, nodeLabel } from "../../src/orchestration/domain"
+import { agentRole, createId, isAgentNode, isCheckpointNode, nodeById, nodeLabel } from "../../src/orchestration/domain"
 import type {
   AgentNode,
+  CheckpointDisplay,
+  CheckpointInput,
   CheckpointNode,
   NodeOverrides,
   OrchestrationEdge,
@@ -199,9 +201,11 @@ const SourceSection: Component<{ node: Accessor<AgentNode>; agentInfo: Accessor<
         </Show>
       </div>
       <div class="orch-inspector-section">
-        <div class="orch-inspector-label">{t("orchestration.inspector.mode")}</div>
+        <div class="orch-inspector-label">{t("orchestration.inspector.type")}</div>
         <div class="orch-inspector-value">
-          {props.agentInfo()?.mode ?? t("orchestration.inspector.unresolvedShort")}
+          {props.agentInfo()
+            ? t(`orchestration.agent.${agentRole(props.agentInfo()) ?? "agent"}`)
+            : t("orchestration.inspector.unresolvedShort")}
         </div>
       </div>
     </>
@@ -473,12 +477,21 @@ const CheckpointInspector: Component<{ node: Accessor<CheckpointNode> } & SubPro
   const { t } = useOrchestrationLanguage()
   const node = () => props.node()
 
-  const setCheckpoint = (patch: Partial<{ prompt: string; options: Array<{ id: string; label: string }> }>) => {
+  const setCheckpoint = (
+    patch: Partial<{
+      prompt: string
+      options: Array<{ id: string; label: string }>
+      display: CheckpointDisplay
+      input: CheckpointInput
+    }>,
+  ) => {
     props.mutate((g) => {
       const target = g.nodes.find((item) => item.id === node().id)
       if (!target || !isCheckpointNode(target)) return
       if (typeof patch.prompt === "string") target.prompt = patch.prompt
       if (patch.options) target.options = patch.options
+      if (patch.display) target.display = patch.display
+      if (patch.input) target.input = patch.input
     })
   }
 
@@ -528,6 +541,71 @@ const CheckpointInspector: Component<{ node: Accessor<CheckpointNode> } & SubPro
         <Button size="small" variant="secondary" icon="plus" onClick={addOption}>
           {t("orchestration.inspector.addOutcome")}
         </Button>
+      </div>
+
+      <div class="orch-inspector-section">
+        <div class="orch-inspector-label">{t("orchestration.inspector.checkpointDisplay")}</div>
+        <Field label={t("orchestration.inspector.displayMode")}>
+          <select
+            class="orch-inspector-select"
+            value={node().display?.mode ?? "predecessors"}
+            onChange={(e) => {
+              const mode = (e.target as HTMLSelectElement).value as "none" | "predecessors"
+              setCheckpoint({ display: { mode, ...(node().display?.title ? { title: node().display!.title } : {}) } })
+            }}
+          >
+            <option value="predecessors">{t("orchestration.inspector.displayPredecessors")}</option>
+            <option value="none">{t("orchestration.inspector.displayNone")}</option>
+          </select>
+        </Field>
+        <Show when={(node().display?.mode ?? "predecessors") === "predecessors"}>
+          <Field label={t("orchestration.inspector.displayTitle")}>
+            <input
+              class="orch-inspector-input"
+              value={node().display?.title ?? ""}
+              placeholder={t("orchestration.inspector.displayTitlePlaceholder")}
+              onInput={(e) => {
+                const title = (e.target as HTMLInputElement).value
+                setCheckpoint({ display: { mode: "predecessors", ...(title ? { title } : {}) } })
+              }}
+            />
+          </Field>
+        </Show>
+      </div>
+
+      <div class="orch-inspector-section">
+        <div class="orch-inspector-label">{t("orchestration.inspector.checkpointInput")}</div>
+        <Field label={t("orchestration.inspector.inputMode")}>
+          <select
+            class="orch-inspector-select"
+            value={node().input?.mode ?? "optional"}
+            onChange={(e) => {
+              const mode = (e.target as HTMLSelectElement).value as "none" | "optional" | "required"
+              setCheckpoint({
+                input: { mode, ...(node().input?.placeholder ? { placeholder: node().input!.placeholder } : {}) },
+              })
+            }}
+          >
+            <option value="optional">{t("orchestration.inspector.inputOptional")}</option>
+            <option value="required">{t("orchestration.inspector.inputRequired")}</option>
+            <option value="none">{t("orchestration.inspector.inputNone")}</option>
+          </select>
+        </Field>
+        <Show when={(node().input?.mode ?? "optional") !== "none"}>
+          <Field label={t("orchestration.inspector.inputPlaceholder")}>
+            <input
+              class="orch-inspector-input"
+              value={node().input?.placeholder ?? ""}
+              placeholder={t("orchestration.inspector.inputPlaceholderValue")}
+              onInput={(e) => {
+                const placeholder = (e.target as HTMLInputElement).value
+                setCheckpoint({
+                  input: { mode: node().input?.mode ?? "optional", ...(placeholder ? { placeholder } : {}) },
+                })
+              }}
+            />
+          </Field>
+        </Show>
       </div>
 
       <NodeActions
