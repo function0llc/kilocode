@@ -11,9 +11,13 @@ const Content: Component = () => {
   const vscode = useVSCode()
   const data = useOrchestrationData()
   const [open, setOpen] = createSignal<OrchestrationGraph | null>(null)
+  const [existing, setExisting] = createSignal(false)
 
   const unsub = vscode.onMessage((message) => {
-    if (message.type === "orchestration.graph") setOpen(message.graph)
+    if (message.type === "orchestration.graph") {
+      setExisting(true)
+      setOpen(message.graph)
+    }
     if (message.type === "orchestration.deleted" && open()?.id === message.graphId) setOpen(null)
   })
   onCleanup(unsub)
@@ -24,6 +28,7 @@ const Content: Component = () => {
       {open() ? (
         <Editor
           initial={open()!}
+          existing={existing()}
           onClose={() => {
             setOpen(null)
             vscode.postMessage({ type: "orchestration.listGraphs" })
@@ -32,7 +37,10 @@ const Content: Component = () => {
       ) : (
         <GraphGallery
           onOpen={(graphId) => vscode.postMessage({ type: "orchestration.loadGraph", graphId })}
-          onNew={setOpen}
+          onNew={(graph) => {
+            setExisting(false)
+            setOpen(graph)
+          }}
         />
       )}
     </div>

@@ -11,7 +11,7 @@ export type OrchestrationRun = OrchestrationStartResponse
 export type OrchestrationRequest =
   | { type: "orchestration.listGraphs" }
   | { type: "orchestration.loadGraph"; graphId: string }
-  | { type: "orchestration.saveGraph"; graph: OrchestrationGraph }
+  | { type: "orchestration.saveGraph"; graph: OrchestrationGraph; existing: boolean }
   | { type: "orchestration.deleteGraph"; graphId: string }
   | { type: "orchestration.duplicateGraph"; graphId: string }
   | { type: "orchestration.renameGraph"; graphId: string; name: string }

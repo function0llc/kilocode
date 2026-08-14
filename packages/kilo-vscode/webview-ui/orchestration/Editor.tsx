@@ -23,6 +23,7 @@ import type { OrchestrationRun } from "../src/types/messages/orchestration"
 
 interface Props {
   initial: OrchestrationGraph
+  existing: boolean
   onClose: () => void
 }
 
@@ -34,6 +35,7 @@ export const Editor: Component<Props> = (props) => {
   const [graph, setGraph] = createStore<OrchestrationGraph>(props.initial)
   const [dirty, setDirty] = createSignal(false)
   const [saving, setSaving] = createSignal(false)
+  const [existing, setExisting] = createSignal(props.existing)
   const [publishing, setPublishing] = createSignal(false)
   const [pendingPublish, setPendingPublish] = createSignal(false)
   const [selected, setSelected] = createSignal<Selection | null>(null)
@@ -113,7 +115,7 @@ export const Editor: Component<Props> = (props) => {
       setGraph("name", graph.name.trim())
     }
     setSaving(true)
-    vscode.postMessage({ type: "orchestration.saveGraph", graph: unwrap(graph) })
+    vscode.postMessage({ type: "orchestration.saveGraph", graph: unwrap(graph), existing: existing() })
   }
 
   const publish = () => {
@@ -220,6 +222,7 @@ export const Editor: Component<Props> = (props) => {
     switch (message.type) {
       case "orchestration.saved":
         setGraph(reconcile(message.graph))
+        setExisting(true)
         setDirty(false)
         setSaving(false)
         if (pendingPublish()) {

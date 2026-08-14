@@ -71,6 +71,16 @@ export async function writeGraph(configDir: string, graph: OrchestrationGraph): 
   return next
 }
 
+export async function persistGraph(
+  configDir: string,
+  graph: OrchestrationGraph,
+  persisted: boolean,
+): Promise<{ saved: OrchestrationGraph; previous: OrchestrationGraph | null }> {
+  const previous = persisted && graph.id ? await readGraph(configDir, graph.id) : null
+  const id = previous ? previous.id : await uniqueId(configDir, graph.id || graph.name)
+  return { saved: await writeGraph(configDir, { ...graph, id }), previous }
+}
+
 export async function deleteGraph(configDir: string, id: string): Promise<void> {
   await rm(path.join(dirFor(configDir), `${safeId(id)}.json`), { force: true })
 }

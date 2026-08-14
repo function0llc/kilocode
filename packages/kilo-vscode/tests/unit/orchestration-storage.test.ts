@@ -10,6 +10,7 @@ import {
   duplicateGraph,
   listGraphs,
   parseGraph,
+  persistGraph,
   readGraph,
   renameGraph,
   safeId,
@@ -92,6 +93,21 @@ describe("orchestration graph storage", () => {
     const renamed = await renameGraph(configDir, graph.id, "After")
     expect(renamed?.name).toBe("After")
     expect((await readGraph(configDir, graph.id))?.name).toBe("After")
+  })
+
+  it("preserves a stored graph id when its editor name changes", async () => {
+    const graph = await writeGraph(configDir, seed("Before"))
+    const result = await persistGraph(configDir, { ...graph, name: "After" }, true)
+    expect(result.saved.id).toBe(graph.id)
+    expect(result.previous?.name).toBe("Before")
+    expect((await listGraphs(configDir)).map((item) => item.name)).toEqual(["After"])
+  })
+
+  it("gives a new graph a unique id instead of overwriting a slug collision", async () => {
+    await writeGraph(configDir, seed("Existing", { id: "same" }))
+    const result = await persistGraph(configDir, seed("New", { id: "same" }), false)
+    expect(result.saved.id).toBe("same-2")
+    expect(await listGraphs(configDir)).toHaveLength(2)
   })
 
   it("deletes a graph and is idempotent", async () => {

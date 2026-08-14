@@ -6,8 +6,8 @@ import { retry } from "../services/cli-backend/retry"
 import { type KiloConnectionService, ServerStartupError } from "../services/cli-backend"
 import { computeDefaultSelection, fetchProviderData } from "../provider-actions"
 import { validateGraph, type OrchestrationGraph } from "./domain"
-import { deleteGraph, duplicateGraph, listGraphs, readGraph, renameGraph, uniqueId, writeGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError, unpublishGraph } from "./publish"
+import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
+import { buildAgentConfigFromGraph, PublishError, syncPublishedAgent, unpublishGraph } from "./publish"
 import type { OrchestrationRequest } from "./messages"
 import type { OrchestrationStartData } from "@kilocode/sdk/v2"
 
@@ -193,7 +193,7 @@ export class OrchestrationProvider implements vscode.Disposable {
         await this.loadGraph(msg.graphId)
         return
       case "orchestration.saveGraph":
-        await this.saveGraph(msg.graph)
+        await this.saveGraph(msg.graph, msg.existing)
         return
       case "orchestration.deleteGraph":
         await this.removeGraph(msg.graphId)
@@ -253,17 +253,23 @@ export class OrchestrationProvider implements vscode.Disposable {
     }
   }
 
-  private async saveGraph(graph: OrchestrationGraph): Promise<void> {
+  private async saveGraph(graph: OrchestrationGraph, persisted: boolean): Promise<void> {
     try {
       const dir = await this.configDir()
       // A brand-new graph's id is just its name slug; if a different graph
       // already owns that file, give the newcomer a unique id instead of
       // overwriting the existing one.
-      const existing = graph.id ? await readGraph(dir, graph.id) : null
-      const id = existing && existing.name === graph.name ? existing.id : await uniqueId(dir, graph.id || graph.name)
-      const saved = await writeGraph(dir, { ...graph, id })
-      this.post({ type: "orchestration.saved", graph: saved })
+      const result = await persistGraph(dir, graph, persisted)
+      const renamed =
+        result.previous !== null &&
+        result.previous.name !== result.saved.name &&
+        (await syncPublishedAgent(this.connection.getClient(), this.directory(), result.saved))
+      this.post({ type: "orchestration.saved", graph: result.saved })
       await this.sendGraphs()
+      if (renamed) {
+        this.cachedAgents = null
+        await this.fetchAndSendAgents()
+      }
     } catch (err) {
       this.fail("saveGraph", err)
     }
@@ -305,8 +311,13 @@ export class OrchestrationProvider implements vscode.Disposable {
         this.post({ type: "orchestration.failed", operation: "renameGraph", message: "Graph not found" })
         return
       }
+      const renamed = await syncPublishedAgent(this.connection.getClient(), this.directory(), graph)
       this.post({ type: "orchestration.saved", graph })
       await this.sendGraphs()
+      if (renamed) {
+        this.cachedAgents = null
+        await this.fetchAndSendAgents()
+      }
     } catch (err) {
       this.fail("renameGraph", err)
     }

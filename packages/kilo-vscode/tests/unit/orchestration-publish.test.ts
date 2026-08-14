@@ -5,6 +5,7 @@ import {
   buildAgentConfigFromGraph,
   publishedAgentPaths,
   PublishError,
+  syncPublishedAgent,
   unpublishGraph,
 } from "../../src/orchestration/publish"
 
@@ -97,6 +98,50 @@ describe("orchestration publish", () => {
           ["agent", "current"],
           ["agent", "renamed"],
         ],
+      },
+    ])
+  })
+
+  it("renames the agent published from a renamed graph", async () => {
+    const patches: unknown[] = []
+    const client = {
+      config: {
+        overlay: async () => ({
+          data: {
+            global: {
+              agent: {
+                "old-name": {
+                  options: { kiloOrchestration: { version: 2, graph: { id: "plan", scope: "global" } } },
+                },
+                architect: {},
+              },
+            },
+          },
+        }),
+        overlayUpdate: async (patch: unknown) => {
+          patches.push(patch)
+          return { data: {} }
+        },
+      },
+    }
+
+    expect(await syncPublishedAgent(client as never, "/repo", graph({ id: "plan", name: "New Name" }))).toBe(true)
+    expect(patches).toEqual([
+      {
+        directory: "/repo",
+        scope: "global",
+        set: {
+          agent: {
+            "new-name": {
+              mode: "primary",
+              displayName: "New Name",
+              description: 'Deterministic orchestration "New Name"',
+              prompt: null,
+              options: { kiloOrchestration: { version: 2, graph: { id: "plan", scope: "global" } } },
+            },
+          },
+        },
+        unset: [["agent", "old-name"]],
       },
     ])
   })

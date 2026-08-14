@@ -2,4 +2,4 @@
 "kilo-code": patch
 ---
 
-Allow editing an orchestrator's name directly in the orchestration editor.
+Allow renaming an orchestrator in place and keep its published agent name synchronized.

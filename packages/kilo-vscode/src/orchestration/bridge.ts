@@ -2,8 +2,8 @@ import type { KiloClient, OrchestrationStartData } from "@kilocode/sdk/v2"
 import { getErrorMessage } from "../kilo-provider-utils"
 import type { OrchestrationRequest } from "./messages"
 import { validateGraph, type OrchestrationGraph } from "./domain"
-import { deleteGraph, duplicateGraph, listGraphs, readGraph, renameGraph, uniqueId, writeGraph } from "./graph-storage"
-import { buildAgentConfigFromGraph, PublishError, unpublishGraph } from "./publish"
+import { deleteGraph, duplicateGraph, listGraphs, persistGraph, readGraph, renameGraph } from "./graph-storage"
+import { buildAgentConfigFromGraph, PublishError, syncPublishedAgent, unpublishGraph } from "./publish"
 
 type Options = {
   client: () => KiloClient
@@ -27,7 +27,7 @@ export class OrchestrationBridge {
         case "orchestration.loadGraph":
           return await this.load(message.graphId)
         case "orchestration.saveGraph":
-          return await this.save(message.graph)
+          return await this.save(message.graph, message.existing)
         case "orchestration.deleteGraph":
           return await this.remove(message.graphId)
         case "orchestration.duplicateGraph":
@@ -61,13 +61,16 @@ export class OrchestrationBridge {
     this.opts.post({ type: "orchestration.graph", graph })
   }
 
-  private async save(graph: OrchestrationGraph) {
+  private async save(graph: OrchestrationGraph, persisted: boolean) {
     const dir = await this.opts.configDir()
-    const existing = graph.id ? await readGraph(dir, graph.id) : null
-    const id = existing && existing.name === graph.name ? existing.id : await uniqueId(dir, graph.id || graph.name)
-    const saved = await writeGraph(dir, { ...graph, id })
-    this.opts.post({ type: "orchestration.saved", graph: saved })
+    const result = await persistGraph(dir, graph, persisted)
+    const renamed =
+      result.previous !== null &&
+      result.previous.name !== result.saved.name &&
+      (await syncPublishedAgent(this.opts.client(), this.opts.directory(), result.saved))
+    this.opts.post({ type: "orchestration.saved", graph: result.saved })
     await this.graphs()
+    if (renamed) await this.opts.refreshAgents?.()
   }
 
   private async remove(id: string) {
@@ -88,8 +91,10 @@ export class OrchestrationBridge {
   private async rename(id: string, name: string) {
     const graph = await renameGraph(await this.opts.configDir(), id, name.trim() || "Untitled")
     if (!graph) return this.fail("renameGraph", "Graph not found")
+    const renamed = await syncPublishedAgent(this.opts.client(), this.opts.directory(), graph)
     this.opts.post({ type: "orchestration.saved", graph })
     await this.graphs()
+    if (renamed) await this.opts.refreshAgents?.()
   }
 
   private async publish(id: string) {
